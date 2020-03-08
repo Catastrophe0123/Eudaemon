@@ -6,7 +6,7 @@ module.exports = async (req, res, next) => {
     try {
         const token = req.header('Authorization');
         const decoded = jwt.verify(token, JWTSECRET);
-        const foundUser = await User.findById(decoded.user.id);
+        const foundUser = await User.findById(decoded.user.id, '-password');
         if (!foundUser) {
             return res.status(401).json({ message: 'unauthorized' });
         }

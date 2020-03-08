@@ -3,6 +3,8 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { JWTSECRET } = require('../config');
+const isAuth = require('../Middleware/isAuth');
+const isCCI = require('../Middleware/isCCI');
 
 router.post('/register', async function(req, res) {
     // register route
@@ -53,6 +55,68 @@ router.post('/login', async function(req, res) {
         return res
             .status(200)
             .json({ message: 'logged in successfully', token });
+    } catch (err) {
+        return res.status(400).json({ message: err.message });
+    }
+});
+
+router.post('/cci/register', isAuth, async function(req, res) {
+    // register new cci
+    try {
+        let newCci = new Cci({
+            username: req.body.username,
+            password: req.body.password,
+            address: req.body.address,
+            DCPU: req.body.DCPU
+        });
+        let salt = await bcrypt.genSalt(12);
+        let hashed = await bcrypt.hash(req.body.password, salt);
+        newCci.password = hashed;
+        await newCci.save();
+        return res.status(201).json({
+            message: 'user created successfully',
+            id: newCci.id
+        });
+    } catch (err) {
+        return res.status(400).json({ message: err.message });
+    }
+});
+
+router.post('/cci/login', [isAuth], async function(req, res) {
+    try {
+        let { username, password } = req.body;
+        let foundCCI = await User.findOne({ username });
+        if (!foundCCI) {
+            return res
+                .status(400)
+                .json({ message: 'CCI : invalid credentials' });
+        }
+
+        let isMatched = await bcrypt.compare(password, foundCCI.password);
+        if (!isMatched) {
+            return res
+                .status(400)
+                .json({ message: 'CCI : invalid credentials' });
+        }
+
+        // check if the person is the proprietor of the cci
+
+        if (req.user.id !== foundCCI.proprietor) {
+            return res.status(403).json({
+                message:
+                    'CCI : you are not the proprietor of this CCI. Access Denied'
+            });
+        }
+
+        let payload = {
+            cci: { id: foundCCI.id }
+        };
+
+        const CCItoken = jwt.sign(payload, JWTSECRET, { expiresIn: 3600 });
+
+        return res
+            .status(200)
+            .json({ message: 'CCI : logged in successfully', CCItoken });
     } catch (err) {
         return res.status(400).json({ message: err.message });
     }
