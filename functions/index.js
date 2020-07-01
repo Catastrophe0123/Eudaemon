@@ -14,6 +14,8 @@ const {
 
 const { createChild, updateChild } = require('./controllers/child');
 
+const { uploadSIR } = require('./controllers/fileUpload');
+
 // TODO: validation
 // returns the list of organisations in the db
 /**
@@ -57,6 +59,8 @@ app.post('/child', isAuth, createChild);
 // update a child's data
 // TODO: validation
 app.put('/child/:id', isAuth, updateChild);
+
+app.post('/child/:id/sir', isAuth, uploadSIR);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
