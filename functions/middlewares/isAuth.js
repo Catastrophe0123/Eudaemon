@@ -13,8 +13,6 @@ const isAuth = async (req, res, next) => {
 
 		let decodedToken = await admin.auth().verifyIdToken(token);
 		// let x = await firebase.auth().signInWithCustomToken(token);
-		console.log(decodedToken);
-
 		req.user = decodedToken;
 
 		return next();
