@@ -12,6 +12,8 @@ const {
 	postLogin,
 } = require('./controllers/authentication');
 
+const { createChild, updateChild } = require('./controllers/child');
+
 // TODO: validation
 // returns the list of organisations in the db
 /**
@@ -48,10 +50,13 @@ app.post('/signup', postSignup);
  */
 app.post('/login', postLogin);
 
-app.post('/createchild', isAuth, (req, res) => {
-	// user is verified
-	console.log('consoling : ', req.user);
-});
+// create a new child in the database
+// TODO: Validation
+app.post('/child', isAuth, createChild);
+
+// update a child's data
+// TODO: validation
+app.put('/child', isAuth, updateChild);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
