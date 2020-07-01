@@ -1,27 +1,20 @@
 const functions = require('firebase-functions');
+// var admin = require('firebase-admin');
 
-// const admin = require('firebase-admin');
-// admin.initializeApp();
+var isAuth = require('./middlewares/isAuth');
 
-var admin = require('firebase-admin');
+// admin.initializeApp({
+// 	credential: admin.credential.cert(serviceAccount),
+// 	databaseURL: 'https://eudaemon-20a5e.firebaseio.com',
+// });
 
-var serviceAccount = require('./serviceAccountKey.json');
-
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: 'https://eudaemon-20a5e.firebaseio.com',
-});
-
+var admin = require('./firebaseadmin');
 const db = admin.firestore();
 
 const express = require('express');
 const app = express();
 
-const firebase = require('firebase');
-
-const firebaseConfig = require('./firebaseConfig');
-firebase.initializeApp(firebaseConfig);
-
+const firebase = require('./firebaseConfig');
 // TODO: validation
 // returns the list of organisations in the db
 /**
@@ -88,15 +81,16 @@ app.post('/signup', async (req, res) => {
 			.auth()
 			.createUserWithEmailAndPassword(newUser.email, req.body.password);
 
-		// await admin
-		// 	.auth()
-		// 	.setCustomUserClaims(data.user.uid, { role: newUser.role });
-
-		// TRYING CUSTOM TOKEN
-		const newToken = await admin.auth().createCustomToken(data.user.uid, {
+		await admin.auth().setCustomUserClaims(data.user.uid, {
 			role: newUser.role,
 			organisation: newUser.organisation,
 		});
+
+		// TRYING CUSTOM TOKEN
+		// const newToken = await admin.auth().createCustomToken(data.user.uid, {
+		// 	role: newUser.role,
+		// 	organisation: newUser.organisation,
+		// });
 
 		newUser['createdAt'] = new Date().toISOString();
 		newUser['uid'] = data.user.uid;
@@ -104,9 +98,10 @@ app.post('/signup', async (req, res) => {
 
 		// let token = await data.user.getIdToken();
 
-		return res
-			.status(201)
-			.json({ message: `user ${data.user.uid} created`, newToken });
+		return res.status(201).json({
+			message: `user ${data.user.uid} created`,
+			token: await data.user.getIdToken(),
+		});
 	} catch (err) {
 		console.error(err);
 		return res.status(500).json({ error: err.message });
@@ -156,13 +151,14 @@ app.post('/login', async (req, res) => {
 			collection.organisation === organisation
 		) {
 			// correct - generate custom token and return
-			let customToken = await admin
-				.auth()
-				.createCustomToken(data.user.uid, {
-					role: role,
-					organisation: organisation,
-				});
-			return res.status(200).json({ token: customToken });
+			// let customToken = await admin
+			// 	.auth()
+			// 	.createCustomToken(data.user.uid, {
+			// 		role: role,
+			// 		organisation: organisation,
+			// 	});
+			let token = await data.user.getIdToken();
+			return res.status(200).json({ token: token });
 		} else {
 			return res
 				.status(400)
@@ -171,6 +167,11 @@ app.post('/login', async (req, res) => {
 	} catch (err) {
 		return res.status(400).json({ error: err.message });
 	}
+});
+
+app.post('/createchild', isAuth, (req, res) => {
+	// user is verified
+	console.log(req.user);
 });
 
 exports.api = functions.https.onRequest(app);
