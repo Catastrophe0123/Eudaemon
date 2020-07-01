@@ -56,7 +56,7 @@ app.post('/child', isAuth, createChild);
 
 // update a child's data
 // TODO: validation
-app.put('/child', isAuth, updateChild);
+app.put('/child/:id', isAuth, updateChild);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);

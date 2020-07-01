@@ -31,3 +31,33 @@ exports.createChild = async (req, res) => {
 			.json({ error: 'something went wrong', err: err });
 	}
 };
+
+exports.updateChild = async (req, res) => {
+	// authenticated user
+	try {
+		id = req.params.id;
+		let childData = req.body;
+		if (req.user.role === 'CCI') {
+			return res.status(401).json({ error: 'unauthorized user' });
+		}
+		childData['lastEditedByUser'] = req.user.email;
+		childData['lastEditedBy'] = req.user.user_id;
+		childData['lastEditedAt'] = new Date().toISOString();
+
+		let doc = await db.doc(`children/${id}`).get();
+
+		if (!doc.exists) {
+			return res.status(400).json({ error: 'invalid id' });
+		} else {
+			// document exists
+			let x = await db
+				.doc(`children/${id}`)
+				.set(childData, { merge: true });
+			return res
+				.status(200)
+				.json({ message: 'document updated successfully' });
+		}
+	} catch (err) {
+		console.error(err);
+	}
+};
