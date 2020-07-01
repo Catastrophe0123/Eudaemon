@@ -1,5 +1,5 @@
-var { admin, db } = require('./firebaseadmin');
-const firebase = require('./firebaseConfig');
+var { admin, db } = require('../firebaseadmin');
+const firebase = require('../firebaseConfig');
 
 exports.getLogin = async (req, res) => {
 	try {
