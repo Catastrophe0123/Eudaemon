@@ -13,25 +13,30 @@ const isCorrectCCI = async (req, res, next) => {
 	}
 
 	if (req.user.role === 'CCI') {
-		let doc = await db.doc(`children/${id}`).get();
-		if (!doc.exists) {
-			// invalid id i guess
-			return res
-				.status(400)
-				.json({ message: 'document does not exist. wrong id' });
-		} else {
-			// doc exists
-			let docData = doc.data();
-			if (docData.organisation === req.user.organisation) {
-				// authorised
-				req.childData = docData;
-				return next();
-			} else {
-				// unauthorized
+		try {
+			let doc = await db.doc(`children/${id}`).get();
+			if (!doc.exists) {
+				// invalid id i guess
 				return res
-					.status(403)
-					.json({ message: 'You do not have access to this data' });
+					.status(400)
+					.json({ message: 'document does not exist. wrong id' });
+			} else {
+				// doc exists
+				let docData = doc.data();
+				if (docData.organisation === req.user.organisation) {
+					// authorised
+					req.childData = docData;
+					return next();
+				} else {
+					// unauthorized
+					return res.status(403).json({
+						message: 'You do not have access to this data',
+					});
+				}
 			}
+		} catch (err) {
+			console.error(err);
+			return res.status(500).json({ err: err.message });
 		}
 	}
 };

@@ -2,7 +2,7 @@ var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
 const fbconfig = require('../firebaseconfigjson');
 
-exports.uploadSIR = async (req, res) => {
+exports.uploadFiles = async (req, res) => {
 	const id = req.params.id;
 	const type = req.params.type;
 
