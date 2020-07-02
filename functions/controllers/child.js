@@ -61,3 +61,8 @@ exports.updateChild = async (req, res) => {
 		console.error(err);
 	}
 };
+
+exports.getChild = (req, res) => {
+	// we have the child's data in req.childData
+	return res.status(200).json(req.childData);
+};

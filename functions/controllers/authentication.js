@@ -64,9 +64,13 @@ exports.postSignup = async (req, res) => {
 
 		// let token = await data.user.getIdToken();
 
+		let data1 = await firebase
+			.auth()
+			.signInWithEmailAndPassword(newUser.email, req.body.password);
+
 		return res.status(201).json({
 			message: `user ${data.user.uid} created`,
-			token: await data.user.getIdToken(),
+			token: await data1.user.getIdToken(),
 		});
 	} catch (err) {
 		console.error(err);

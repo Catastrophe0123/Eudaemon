@@ -1,8 +1,6 @@
 const functions = require('firebase-functions');
 // var admin = require('firebase-admin');
 
-var isAuth = require('./middlewares/isAuth');
-
 const express = require('express');
 const app = express();
 
@@ -12,9 +10,14 @@ const {
 	postLogin,
 } = require('./controllers/authentication');
 
-const { createChild, updateChild } = require('./controllers/child');
+// CONTROLLERS
+const { createChild, updateChild, getChild } = require('./controllers/child');
+const { uploadFiles } = require('./controllers/fileUpload');
 
-const { uploadSIR } = require('./controllers/fileUpload');
+// MIDDLEWARES
+var isAuth = require('./middlewares/isAuth');
+var isNotCCI = require('./middlewares/isNotCCI');
+var isCorrectCCI = require('./middlewares/isCorrectCCI');
 
 // TODO: validation
 // returns the list of organisations in the db
@@ -54,13 +57,16 @@ app.post('/login', postLogin);
 
 // create a new child in the database
 // TODO: Validation
-app.post('/child', isAuth, createChild);
+app.post('/child', [isAuth, isNotCCI], createChild);
 
 // update a child's data
 // TODO: validation
-app.put('/child/:id', isAuth, updateChild);
+app.put('/child/:id', [isAuth, isNotCCI], updateChild);
 
-app.post('/child/:id/sir', isAuth, uploadSIR);
+// Upload child data : cannot be accessed by CCI
+app.post('/child/:id/upload/:type', [isAuth, isNotCCI], uploadFiles);
+
+app.get('/child/:id', [isAuth, isCorrectCCI], getChild);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
