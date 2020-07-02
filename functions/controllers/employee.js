@@ -3,13 +3,24 @@ const firebase = require('../firebaseConfig');
 
 exports.createEmployee = async (req, res) => {
 	try {
-		let district = req.body.district;
+		let org = req.user.organisation;
 		let empData = req.body;
 		empData['createdAt'] = new Date().toISOString();
 		empData['createdBy'] = req.user.user_id;
 		empData['createdByUser'] = req.user.email;
 		// we have req.dcpuData
 		let doc = await db.collection('employees').add(empData);
+		// add the employee to dcpu
+
+		// let x = await db.doc(`dcpu/${org}`).update({
+		// 	employees: firebase.firestore.FieldValue.arrayUnion(doc.id),
+		// });
+
+		let x = await db.collection('dcpu').doc(org);
+		x.update({
+			employees: admin.firestore.FieldValue.arrayUnion(doc.id),
+		});
+
 		return res
 			.status(201)
 			.json({ message: 'employee created successfully' });
