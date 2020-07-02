@@ -26,7 +26,9 @@ exports.createCCI = async (req, res) => {
 		} else {
 			// create the entry
 			let dataToAdd = { ...req.body };
-			dataToAdd['dateJoined'] = new Date().toISOString();
+			dataToAdd['createdAt'] = new Date().toISOString();
+			dataToAdd['createdBy'] = req.user.user_id;
+			dataToAdd['createdByUser'] = req.user.email;
 			let cwc = req.body.cwc;
 			let dcpu = req.body.dcpu;
 
@@ -89,4 +91,46 @@ exports.createCCI = async (req, res) => {
 		console.error(err);
 		return res.status(500).json({ error: err.message });
 	}
+};
+
+exports.editCCI = async (req, res) => {
+	// edit a cci
+	try {
+		let id = req.params.id;
+		// id of the cci
+		let data = req.body;
+		data['lastEditedBy'] = req.user.user_id;
+		data['lastEditedByUser'] = req.user.email;
+		data['lastEditedAt'] = new Date().toISOString();
+
+		let doc = await db.doc(`/cci/${id}`).update(data);
+		return res.status(200).json({ message: 'CCI edited successfully' });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
+
+exports.getCCI = async (req, res) => {
+	let id = req.params.id;
+	// id is the id of the CCI
+	let organisation = req.user.organisation;
+	let role = req.user.role;
+
+	if (role === 'CCI') {
+		if (organisation != id) {
+			return res.status(403).json({
+				error: 'unauthorized. You can only view your own data',
+			});
+		}
+	}
+
+	let doc = await db.doc(`cci/${id}`).get();
+	if (!doc.exists) {
+		return res
+			.status(400)
+			.json({ error: 'invalid id or document does not exist ' });
+	}
+	let data = doc.data();
+	return res.status(200).json(data);
 };

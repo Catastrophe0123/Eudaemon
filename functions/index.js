@@ -13,7 +13,7 @@ const {
 // CONTROLLERS
 const { createChild, updateChild, getChild } = require('./controllers/child');
 const { uploadFiles } = require('./controllers/fileUpload');
-const { createCCI } = require('./controllers/cci');
+const { createCCI, editCCI, getCCI } = require('./controllers/cci');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -87,6 +87,17 @@ req.body = {
     TODO: Validation
  */
 app.post('/cci', [isAuth, isNotCCI, isDCPU, isCorrectDCPU], createCCI);
+
+// req.body = {
+//     district: String
+// }
+// TODO: Validation
+app.put('/cci/:id', [isAuth, isNotCCI, isDCPU, isCorrectDCPU], editCCI);
+
+app.get('/cci/:id', [isAuth], getCCI);
+
+// employee routes
+// app.post("/employees",  )
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
