@@ -60,7 +60,9 @@ app.post('/child', isAuth, createChild);
 // TODO: validation
 app.put('/child/:id', isAuth, updateChild);
 
-app.post('/child/:id/sir', isAuth, uploadSIR);
+// app.post('/child/:id/sir', isAuth, uploadSIR);
+// TESTING out new route
+app.post('/child/:id/:type', isAuth, uploadSIR);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
