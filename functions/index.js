@@ -14,7 +14,11 @@ const {
 const { createChild, updateChild, getChild } = require('./controllers/child');
 const { uploadFiles } = require('./controllers/fileUpload');
 const { createCCI, editCCI, getCCI } = require('./controllers/cci');
-const { createEmployee, editEmployee } = require('./controllers/employee');
+const {
+	createEmployee,
+	editEmployee,
+	getEmployee,
+} = require('./controllers/employee');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -101,6 +105,8 @@ app.get('/cci/:id', [isAuth], getCCI);
 app.post('/employees', [isAuth, isDCPU, isCorrectDCPU], createEmployee);
 
 app.put('/employees/:id', [isAuth, isDCPU, isCorrectDCPU], editEmployee);
+
+app.get('/employees/:id', [isAuth], getEmployee);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);

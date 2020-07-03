@@ -46,3 +46,29 @@ exports.editEmployee = async (req, res) => {
 		return res.status(400).json({ message: 'invalid id' });
 	}
 };
+
+exports.getEmployee = async (req, res) => {
+	try {
+		// veerify if role  === cci, then they cant access some1 else's data
+
+		let id = req.params.id;
+		let empDoc = await db.collection('employees').doc(id).get();
+
+		if (!empDoc.exists) {
+			return res.status(400).json({ message: 'invalid id' });
+		}
+		let empData = empDoc.data();
+
+		if (req.user.role === 'CCI') {
+			if (empData.workingAt != req.user.organisation) {
+				return res.status(403).json({
+					error: 'you are not authorized to access this data',
+				});
+			}
+		}
+		return res.status(200).json(empData);
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ message: 'an error occured' });
+	}
+};
