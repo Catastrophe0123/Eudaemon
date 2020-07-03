@@ -1,8 +1,14 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
+const { validationResult } = require('express-validator');
 
 exports.createEmployee = async (req, res) => {
 	try {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors.array());
+		}
+
 		let org = req.user.organisation;
 		let empData = req.body;
 		empData['createdAt'] = new Date().toISOString();
@@ -19,6 +25,7 @@ exports.createEmployee = async (req, res) => {
 		let x = await db.collection('dcpu').doc(org);
 		x.update({
 			employees: admin.firestore.FieldValue.arrayUnion(doc.id),
+			employeeNames: admin.firestore.FieldValue.arrayUnion(req.body.name),
 		});
 
 		return res
@@ -33,6 +40,11 @@ exports.createEmployee = async (req, res) => {
 exports.editEmployee = async (req, res) => {
 	// edit employee
 	try {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors.array());
+		}
+
 		let id = req.params.id;
 		let empData = req.body;
 		empData['lastEditedAt'] = new Date().toISOString();
@@ -44,5 +56,31 @@ exports.editEmployee = async (req, res) => {
 	} catch (err) {
 		console.error(err);
 		return res.status(400).json({ message: 'invalid id' });
+	}
+};
+
+exports.getEmployee = async (req, res) => {
+	try {
+		// veerify if role  === cci, then they cant access some1 else's data
+
+		let id = req.params.id;
+		let empDoc = await db.collection('employees').doc(id).get();
+
+		if (!empDoc.exists) {
+			return res.status(400).json({ message: 'invalid id' });
+		}
+		let empData = empDoc.data();
+
+		if (req.user.role === 'CCI') {
+			if (empData.workingAt != req.user.organisation) {
+				return res.status(403).json({
+					error: 'you are not authorized to access this data',
+				});
+			}
+		}
+		return res.status(200).json(empData);
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ message: 'an error occured' });
 	}
 };
