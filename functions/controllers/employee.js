@@ -1,8 +1,14 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
+const { validationResult } = require('express-validator');
 
 exports.createEmployee = async (req, res) => {
 	try {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors.array());
+		}
+
 		let org = req.user.organisation;
 		let empData = req.body;
 		empData['createdAt'] = new Date().toISOString();
@@ -19,6 +25,7 @@ exports.createEmployee = async (req, res) => {
 		let x = await db.collection('dcpu').doc(org);
 		x.update({
 			employees: admin.firestore.FieldValue.arrayUnion(doc.id),
+			employeeNames: admin.firestore.FieldValue.arrayUnion(req.body.name),
 		});
 
 		return res
@@ -33,6 +40,11 @@ exports.createEmployee = async (req, res) => {
 exports.editEmployee = async (req, res) => {
 	// edit employee
 	try {
+		const errors = validationResult(req);
+		if (!errors.isEmpty()) {
+			return res.status(400).send(errors.array());
+		}
+
 		let id = req.params.id;
 		let empData = req.body;
 		empData['lastEditedAt'] = new Date().toISOString();

@@ -1,6 +1,8 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
 
+const { validationResult } = require('express-validator');
+
 exports.getLogin = async (req, res) => {
 	try {
 		let result = {};
@@ -30,6 +32,11 @@ exports.getLogin = async (req, res) => {
 };
 
 exports.postSignup = async (req, res) => {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).send(errors.array());
+	}
+
 	let availableRoles = ['CCI', 'CWC', 'DCPU', 'PO'];
 
 	if (!availableRoles.includes(req.body.role)) {
@@ -79,6 +86,11 @@ exports.postSignup = async (req, res) => {
 };
 
 exports.postLogin = async (req, res) => {
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).send(errors.array());
+	}
+
 	let availableRoles = ['CCI', 'CWC', 'DCPU', 'PO'];
 
 	if (!availableRoles.includes(req.body.role)) {

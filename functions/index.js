@@ -1,5 +1,6 @@
 const functions = require('firebase-functions');
 // var admin = require('firebase-admin');
+const { body } = require('express-validator');
 
 const express = require('express');
 const app = express();
@@ -53,7 +54,17 @@ app.get('/login', getLogin);
 
 // signup route
 // TODO: Validation
-app.post('/signup', postSignup);
+app.post(
+	'/signup',
+	[
+		body('email').isEmail().withMessage('Email must be valid'),
+		body('password')
+			.trim()
+			.isLength({ min: 6, max: 20 })
+			.withMessage('Password must be between 6 and 20 characters'),
+	],
+	postSignup
+);
 
 //LOGIN ROUTE
 // TODO: Validation
@@ -65,7 +76,21 @@ app.post('/signup', postSignup);
     organisation: String
 }
  */
-app.post('/login', postLogin);
+app.post(
+	'/login',
+	[
+		body('email').isEmail().withMessage('Email must be valid'),
+		body('password')
+			.trim()
+			.isLength({ min: 6, max: 20 })
+			.withMessage('Password must be between 6 and 20 characters'),
+		body('role').notEmpty().withMessage('Must contain role property'),
+		body('organistion')
+			.notEmpty()
+			.withMessage('Must contain organisation property'),
+	],
+	postLogin
+);
 
 // create a new child in the database
 // TODO: Validation
@@ -96,22 +121,97 @@ req.body = {
 }
     TODO: Validation
  */
-app.post('/cci', [isAuth, isNotCCI, isDCPU, isCorrectDCPU], createCCI);
+app.post(
+	'/cci',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain district field'),
+		body('cciName')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain CCI Name'),
+		body('cwc').exists().notEmpty().withMessage('Must contain CWC field'),
+		body('classification')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain classification field'),
+		body('inCharge')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain inCharge field'),
+		body('inChargeName')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain inChargeName field'),
+		body('state')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain state field'),
+		isAuth,
+		isNotCCI,
+		isDCPU,
+		isCorrectDCPU,
+	],
+	createCCI
+);
 
 // req.body = {
 //     district: String
 // }
 // TODO: Validation
-app.put('/cci/:id', [isAuth, isNotCCI, isDCPU, isCorrectDCPU], editCCI);
+app.put(
+	'/cci/:id',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must contain district field'),
+		isAuth,
+		isNotCCI,
+		isDCPU,
+		isCorrectDCPU,
+	],
+	editCCI
+);
 
 app.get('/cci/:id', [isAuth], getCCI);
 
 // employee routes
 // TODO: validation
-app.post('/employees', [isAuth, isDCPU, isCorrectDCPU], createEmployee);
+app.post(
+	'/employees',
+	[
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		isAuth,
+		isDCPU,
+		isCorrectDCPU,
+	],
+	createEmployee
+);
 
 // TODO: validation
-app.put('/employees/:id', [isAuth, isDCPU, isCorrectDCPU], editEmployee);
+app.put(
+	'/employees/:id',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		isAuth,
+		isDCPU,
+		isCorrectDCPU,
+	],
+	editEmployee
+);
 
 // TODO: validation
 app.get('/employees/:id', [isAuth], getEmployee);
@@ -119,7 +219,22 @@ app.get('/employees/:id', [isAuth], getEmployee);
 // GUARDIAN ROUTES
 // TODO: Validation
 // childId
-app.post('/guardian', [isAuth, isNotCCI], createGuardian);
+app.post(
+	'/guardian',
+	[
+		body('childId')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a childId property'),
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		isAuth,
+		isNotCCI,
+	],
+	createGuardian
+);
 
 app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
 

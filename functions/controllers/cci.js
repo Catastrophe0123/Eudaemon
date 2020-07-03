@@ -1,6 +1,8 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
 
+const { validationResult } = require('express-validator');
+
 // req.body = {
 //     district: String,
 //     cciName: String,
@@ -13,6 +15,11 @@ const firebase = require('../firebaseConfig');
 exports.createCCI = async (req, res) => {
 	// req.user req.dcpuData
 	// we have the dcpu data
+
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).send(errors.array());
+	}
 
 	try {
 		let cciName = req.body.cciName;
