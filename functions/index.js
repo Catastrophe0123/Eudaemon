@@ -14,11 +14,17 @@ const {
 // CONTROLLERS
 const { createChild, updateChild, getChild } = require('./controllers/child');
 const { uploadFiles } = require('./controllers/fileUpload');
-const { createCCI, editCCI, getCCI } = require('./controllers/cci');
+const {
+	createCCI,
+	editCCI,
+	getCCI,
+	uploadCCIFiles,
+} = require('./controllers/cci');
 const {
 	createEmployee,
 	editEmployee,
 	getEmployee,
+	uploadEmployeeFiles,
 } = require('./controllers/employee');
 const {
 	createGuardian,
@@ -67,7 +73,6 @@ app.post(
 );
 
 //LOGIN ROUTE
-// TODO: Validation
 /**
  * req.body = {
     email: String,
@@ -93,11 +98,9 @@ app.post(
 );
 
 // create a new child in the database
-// TODO: Validation
 app.post('/child', [isAuth, isNotCCI], createChild);
 
 // update a child's data
-// TODO: validation
 app.put('/child/:id', [isAuth, isNotCCI], updateChild);
 
 // Upload child data : cannot be accessed by CCI
@@ -119,7 +122,6 @@ req.body = {
     inCharge: String,
     state: String,
 }
-    TODO: Validation
  */
 app.post(
 	'/cci',
@@ -160,7 +162,6 @@ app.post(
 // req.body = {
 //     district: String
 // }
-// TODO: Validation
 app.put(
 	'/cci/:id',
 	[
@@ -178,8 +179,13 @@ app.put(
 
 app.get('/cci/:id', [isAuth], getCCI);
 
+app.post(
+	'/cci/:id/upload/:district/:type',
+	[isAuth, isNotCCI, isDCPU],
+	uploadCCIFiles
+);
+
 // employee routes
-// TODO: validation
 app.post(
 	'/employees',
 	[
@@ -198,7 +204,6 @@ app.post(
 	createEmployee
 );
 
-// TODO: validation
 app.put(
 	'/employees/:id',
 	[
@@ -213,11 +218,16 @@ app.put(
 	editEmployee
 );
 
-// TODO: validation
 app.get('/employees/:id', [isAuth], getEmployee);
 
+// can be any type of file. Itll be associated with the employee
+app.post(
+	'/employees/:id/upload/:district/:type',
+	[isAuth, isDCPU],
+	uploadEmployeeFiles
+);
+
 // GUARDIAN ROUTES
-// TODO: Validation
 // childId
 app.post(
 	'/guardian',

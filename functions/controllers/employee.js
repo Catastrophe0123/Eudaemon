@@ -1,6 +1,7 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
 const { validationResult } = require('express-validator');
+const fbconfig = require('../firebaseconfigjson');
 
 exports.createEmployee = async (req, res) => {
 	try {
@@ -83,4 +84,84 @@ exports.getEmployee = async (req, res) => {
 		console.error(err);
 		return res.status(400).json({ message: 'an error occured' });
 	}
+};
+
+exports.uploadEmployeeFiles = async (req, res) => {
+	const district = req.params.district;
+
+	// get the dcpu district
+	let doc = await db.doc(`dcpu/${req.user.organisation}`).get();
+
+	if (!doc.exists) {
+		return res.status(500).json({ error: 'the dcpu does not exist' });
+	} else {
+		let dcpuData = doc.data();
+		if (dcpuData.district === cciDistrict) {
+			req.dcpuData = dcpuData;
+		} else {
+			return res.status(403).json({
+				message: `you can only create CCI's in your own district : ${dcpuData.district}`,
+			});
+		}
+	}
+
+	const id = req.params.id;
+	const type = req.params.type;
+
+	const BusBoy = require('busboy');
+	const path = require('path');
+	const os = require('os');
+	const fs = require('fs');
+
+	const busboy = new BusBoy({ headers: req.headers });
+
+	let fileName;
+	let fileToBeUploaded = {};
+
+	busboy.on('file', (fieldname, file, filename, encoding, mimetype) => {
+		console.log(fieldname);
+		console.log(filename);
+		console.log(mimetype);
+
+		const extension = filename.split('.')[filename.split('.').length - 1];
+		fileName = `${Math.round(Math.random() * 10000000000)}.${extension}`;
+		const filePath = path.join(os.tmpdir(), fileName);
+		fileToBeUploaded = { filePath, mimetype };
+
+		file.pipe(fs.createWriteStream(filePath));
+	});
+
+	busboy.on('finish', async () => {
+		try {
+			let x = await admin
+				.storage()
+				.bucket(fbconfig.storageBucket)
+				.upload(fileToBeUploaded.filePath, {
+					resumable: false,
+					metadata: {
+						metadata: {
+							contentType: fileToBeUploaded.mimetype,
+						},
+					},
+				});
+			const fileurl = `https://firebasestorage.googleapis.com/v0/b/${fbconfig.storageBucket}/o/${fileName}?alt=media`;
+
+			let x = `${type}UploadedByUser`;
+			let y = `${type}UploadedBy`;
+
+			let writeResult = await db.doc(`employees/${id}`).update({
+				[type]: fileUrl,
+				[x]: req.user.email,
+				[y]: req.user.user_id,
+			});
+
+			return res.status(201).json({
+				message: `${type} uploaded at ${fileurl} successfully `,
+			});
+		} catch (err) {
+			console.error(err);
+			return res.status(500).json({ error: err.code });
+		}
+	});
+	busboy.end(req.rawBody);
 };
