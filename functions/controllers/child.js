@@ -1,5 +1,6 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
+const { validationResult } = require('express-validator');
 
 exports.createChild = async (req, res) => {
 	// user is verified
@@ -38,7 +39,7 @@ exports.updateChild = async (req, res) => {
 		id = req.params.id;
 		let childData = req.body;
 		if (req.user.role === 'CCI') {
-			return res.status(401).json({ error: 'unauthorized user' });
+			return res.status(403).json({ error: 'unauthorized user' });
 		}
 		childData['lastEditedByUser'] = req.user.email;
 		childData['lastEditedBy'] = req.user.user_id;
@@ -62,7 +63,24 @@ exports.updateChild = async (req, res) => {
 	}
 };
 
-exports.getChild = (req, res) => {
+exports.getChild = async (req, res) => {
 	// we have the child's data in req.childData
-	return res.status(200).json(req.childData);
+
+	if (!req.childData.guardian) {
+		return res.status(200).json(req.childData);
+	} else {
+		// populate guardian
+		let guardianDoc = await db
+			.collection('guardians')
+			.doc(req.childData.guardian)
+			.get();
+		if (!guardianDoc.exists)
+			return res.status(200).json({
+				error: 'guardian data does not exist',
+				childData: req.childData,
+			});
+		let guardianData = guardianDoc.data();
+		req.childData['guardian'] = guardianData;
+		return res.status(200).json(req.childData);
+	}
 };
