@@ -25,6 +25,17 @@ exports.createCCI = async (req, res) => {
 			});
 		} else {
 			// create the entry
+
+			// before creating, validate the inCharge
+
+			let inCharge = req.body.inCharge;
+			let empDoc = await db.doc(`employees/${inCharge}`).get();
+			if (!empDoc.exists) {
+				return res
+					.status(400)
+					.json({ error: 'employee does not exist' });
+			}
+
 			let dataToAdd = { ...req.body };
 			dataToAdd['createdAt'] = new Date().toISOString();
 			dataToAdd['createdBy'] = req.user.user_id;
@@ -57,29 +68,30 @@ exports.createCCI = async (req, res) => {
 					.json({ error: 'wrong/invalid cwc/dcpu' });
 			} else {
 				// get the cci array and then update
-				let cwcdataref = await db.doc(`cwc/${cwc}`).get();
-				let cwcdata = cwcdataref.data();
 
-				if (cwcdata.ccis.includes(cciName)) {
-					return res
-						.status(400)
-						.json({ error: 'CCI already exists' });
-				}
-				cwcdata.ccis.push(cciName);
+				let cwcdoc = await db
+					.collection('cwc')
+					.doc(cwc)
+					.update({
+						ccis: admin.firestore.FieldValue.arrayUnion(cciName),
+					});
 
-				// let dcpudataref = await db.doc(`cwc/${dcpu}`).get();
-				// let dcpudata = dcpudataref.data();
-				let dcpudata = req.dcpuData;
-				if (dcpudata.ccis.includes(cciName)) {
-					return res
-						.status(400)
-						.json({ error: 'CCI already exists' });
-				}
+				let dcpudoc = await db
+					.collection('dcpu')
+					.doc(dcpu)
+					.update({
+						ccis: admin.firestore.FieldValue.arrayUnion(cciName),
+					});
 
-				dcpudata.ccis.push(cciName);
-
-				await db.doc(`cwc/${cwc}`).update({ ccis: cwcdata.ccis });
-				await db.doc(`dcpu/${dcpu}`).update({ ccis: dcpudata.ccis });
+				// update employee
+				let empdoc = await db
+					.collection('employees')
+					.doc(inCharge)
+					.update({
+						workingAt: cciName,
+						addedBy: req.user.user_id,
+						addedByUser: req.user.email,
+					});
 			}
 
 			let ref = await db.doc(`cci/${cciName}`).set(dataToAdd);
