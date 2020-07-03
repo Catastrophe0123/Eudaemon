@@ -19,6 +19,11 @@ const {
 	editEmployee,
 	getEmployee,
 } = require('./controllers/employee');
+const {
+	createGuardian,
+	updateGuardian,
+	getGuardian,
+} = require('./controllers/guardian.js');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -102,11 +107,21 @@ app.put('/cci/:id', [isAuth, isNotCCI, isDCPU, isCorrectDCPU], editCCI);
 app.get('/cci/:id', [isAuth], getCCI);
 
 // employee routes
+// TODO: validation
 app.post('/employees', [isAuth, isDCPU, isCorrectDCPU], createEmployee);
 
+// TODO: validation
 app.put('/employees/:id', [isAuth, isDCPU, isCorrectDCPU], editEmployee);
 
+// TODO: validation
 app.get('/employees/:id', [isAuth], getEmployee);
+
+// GUARDIAN ROUTES
+// TODO: Validation
+// childId
+app.post('/guardian', [isAuth, isNotCCI], createGuardian);
+
+app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
