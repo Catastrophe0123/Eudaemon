@@ -31,13 +31,19 @@ const {
 	updateGuardian,
 	getGuardian,
 } = require('./controllers/guardian');
-const { getDCPUs } = require('./controllers/dcpu');
+const {
+	getDCPUs,
+	createDCPU,
+	editDCPU,
+	deleteDCPU,
+} = require('./controllers/dcpu');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
 var isNotCCI = require('./middlewares/isNotCCI');
 var isCorrectCCI = require('./middlewares/isCorrectCCI');
 var { isCorrectDCPU, isDCPU } = require('./middlewares/isDCPU');
+var isAdmin = require('./middlewares/isAdmin');
 
 // TODO: validation
 // returns the list of organisations in the db
@@ -249,7 +255,45 @@ app.post(
 
 app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
 
+// DCPU ROUTES
+
+// populates dcpu - employees in the dcpu, inCharge and CCIs
 app.get('/dcpu/:district', [isAuth, isNotCCI], getDCPUs);
+
+// body = {
+// 	district: String,
+// 	name: String,
+// 	inCharge: String,
+// 	inChargeName: String
+// }
+app.post(
+	'/dcpu',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		body('inCharge')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a inCharge property'),
+		body('inChargeName')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a inChargeName property'),
+		isAuth,
+		isAdmin,
+	],
+	createDCPU
+);
+
+app.put('/dcpu/:id', [isAuth, isAdmin], editDCPU);
+
+app.delete('/dcpu/:id', [isAuth, isAdmin], deleteDCPU);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);

@@ -78,3 +78,58 @@ exports.getDCPUs = async (req, res) => {
 		return res.status(500).json({ error: err.message });
 	}
 };
+
+exports.createDCPU = async (req, res) => {
+	// create a dcpu
+
+	let name = req.body.name;
+
+	try {
+		// create a dcpu
+		let doc = await db.collection('dcpu').listDocuments();
+		if (doc.contains(name)) {
+			return res.status(400).json({
+				error: `A DCPU with the name : ${name} already exists`,
+			});
+		}
+
+		let dcpuData = req.body;
+		dcpuData['createdAt'] = new Date().toISOString();
+
+		let x = await db.doc(`dcpu/${name}`).set(dcpuData);
+		return res
+			.status(201)
+			.json({ message: `DCPU with id: ${name} created successfully` });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
+
+exports.editDCPU = async (req, res) => {
+	// edit DCPU
+
+	try {
+		let id = req.params.id;
+		let dcpuData = req.body;
+		dcpuData['lastEditedAt'] = new Date().toISOString();
+
+		let doc = await db.doc(`/dcpu/${id}`).update(dcpuData);
+		return res.status(200).json({ message: 'DCPU edited successfully' });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
+
+exports.deleteDCPU = async (req, res) => {
+	// delete DCPU
+
+	try {
+		let id = req.params.id;
+		let doc = await db.doc(`/dcpu/${id}`).delete();
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
