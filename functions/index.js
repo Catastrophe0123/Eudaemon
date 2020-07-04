@@ -354,5 +354,5 @@ app.delete('/po/:id', [isAuth, isAdmin], deletePO);
 
 app.get('/po/:district', [isAuth, isNotCCI], getPOs);
 
-exports.api = functions.https.onRequest(app);
-// exports.api = functions.region('asia-east2').https.onRequest(app);
+// exports.api = functions.https.onRequest(app);
+exports.api = functions.region('asia-east2').https.onRequest(app);
