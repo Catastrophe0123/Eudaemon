@@ -51,3 +51,50 @@ exports.deleteCWC = async (req, res) => {
 		return res.status(500).json({ error: err.message });
 	}
 };
+
+exports.getCWCs = async (req, res) => {
+	let district = req.params.district;
+
+	// populate inCharge and CCIs
+
+	try {
+		let docs = await db
+			.collection('cwc')
+			.where('district', '==', district)
+			.get();
+		if (docs.empty) {
+			return res.status(400).json({ message: 'no CWCs found' });
+		}
+
+		let allData = docs.docs;
+		let final = [];
+		for (let result of allData) {
+			if (result.exists) {
+				let data = result.data();
+				// get the CCIs in the CWC
+				let cciDoc = await db
+					.collection('cci')
+					.where('cwc', '==', result.id)
+					.get();
+				// data['ccis'] = [...cciDoc.docs[0].];
+				data['ccis'] = [];
+				for (let cci of cciDoc.docs) {
+					data['ccis'].push(cci.data());
+				}
+
+				let inChargedoc = await db
+					.collection('employees')
+					.doc(data['inCharge'])
+					.get();
+
+				data['inChargeData'] = inChargedoc.data();
+
+				final.push(data);
+			}
+		}
+		return res.status(200).json({ final });
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
