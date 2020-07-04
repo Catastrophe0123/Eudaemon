@@ -444,7 +444,7 @@ exports.createNotificationOnChildAdded = functions
 				let x = await db.collection('notification').add({
 					// create the notification
 					createdAt: new Date().toISOString(),
-					recipients: afterData.cci,
+					recipients: [afterData.cci],
 					sender: change.after.id,
 					read: false,
 					type: 'ChildAddedToCCI',
@@ -458,7 +458,7 @@ exports.createNotificationOnChildAdded = functions
 				let x = await db.collection('notification').add({
 					// create the notification
 					createdAt: new Date().toISOString(),
-					recipients: afterData.cci,
+					recipients: [afterData.cci],
 					sender: change.after.id,
 					read: false,
 					type: 'ChildDataUpdated',
