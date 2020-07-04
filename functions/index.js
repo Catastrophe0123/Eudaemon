@@ -469,3 +469,141 @@ exports.createNotificationOnChildAdded = functions
 			return;
 		}
 	});
+
+exports.createNotificationOnDCPUCreated = functions
+	.region('asia-east2')
+	.firestore.document('dcpu/{id}')
+	.onCreate(async (snapshot, context) => {
+		let dcpuDoc = await db
+			.collection('dcpu')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let dcpuIds = [];
+		for (const dcpu of dcpuDoc.docs) {
+			if (snapshot.data().createdBy === dcpu) {
+				continue;
+			}
+			dcpuIds.push(dcpu.id);
+		}
+
+		// cwc
+		let cwcDoc = await db
+			.collection('cwc')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let cwcIds = [];
+		for (const cwc of cwcDoc.docs) {
+			cwcIds.push(cwc.id);
+		}
+
+		//po
+		let poDoc = await db
+			.collection('po')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let poIds = [];
+		for (const cwc of poDoc.docs) {
+			poIds.push(cwc.id);
+		}
+
+		let x = await db.collection('notification').add({
+			// create the notification
+			createdAt: new Date().toISOString(),
+			recipients: [...dcpuIds, ...cwcIds, ...poIds],
+			sender: snapshot.id,
+			read: false,
+			type: 'DCPUCreation',
+		});
+	});
+
+exports.createNotificationOnCWCCreated = functions
+	.region('asia-east2')
+	.firestore.document('po/{id}')
+	.onCreate(async (snapshot, context) => {
+		let dcpuDoc = await db
+			.collection('dcpu')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let dcpuIds = [];
+		for (const dcpu of dcpuDoc.docs) {
+			if (snapshot.data().createdBy === dcpu) {
+				continue;
+			}
+			dcpuIds.push(dcpu.id);
+		}
+
+		// cwc
+		let cwcDoc = await db
+			.collection('cwc')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let cwcIds = [];
+		for (const cwc of cwcDoc.docs) {
+			cwcIds.push(cwc.id);
+		}
+
+		//po
+		let poDoc = await db
+			.collection('po')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let poIds = [];
+		for (const cwc of poDoc.docs) {
+			poIds.push(cwc.id);
+		}
+
+		let x = await db.collection('notification').add({
+			// create the notification
+			createdAt: new Date().toISOString(),
+			recipients: [...dcpuIds, ...cwcIds, ...poIds],
+			sender: snapshot.id,
+			read: false,
+			type: 'CWCCreation',
+		});
+	});
+
+exports.createNotificationOnPOCreated = functions
+	.region('asia-east2')
+	.firestore.document('dcpu/{id}')
+	.onCreate(async (snapshot, context) => {
+		let dcpuDoc = await db
+			.collection('dcpu')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let dcpuIds = [];
+		for (const dcpu of dcpuDoc.docs) {
+			if (snapshot.data().createdBy === dcpu) {
+				continue;
+			}
+			dcpuIds.push(dcpu.id);
+		}
+
+		// cwc
+		let cwcDoc = await db
+			.collection('cwc')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let cwcIds = [];
+		for (const cwc of cwcDoc.docs) {
+			cwcIds.push(cwc.id);
+		}
+
+		//po
+		let poDoc = await db
+			.collection('po')
+			.where('district', '==', snapshot.data().district)
+			.get();
+		let poIds = [];
+		for (const cwc of poDoc.docs) {
+			poIds.push(cwc.id);
+		}
+
+		let x = await db.collection('notification').add({
+			// create the notification
+			createdAt: new Date().toISOString(),
+			recipients: [...dcpuIds, ...cwcIds, ...poIds],
+			sender: snapshot.id,
+			read: false,
+			type: 'POCreation',
+		});
+	});
