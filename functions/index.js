@@ -30,7 +30,8 @@ const {
 	createGuardian,
 	updateGuardian,
 	getGuardian,
-} = require('./controllers/guardian.js');
+} = require('./controllers/guardian');
+const { getDCPUs } = require('./controllers/dcpu');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -90,7 +91,7 @@ app.post(
 			.isLength({ min: 6, max: 20 })
 			.withMessage('Password must be between 6 and 20 characters'),
 		body('role').notEmpty().withMessage('Must contain role property'),
-		body('organistion')
+		body('organisation')
 			.notEmpty()
 			.withMessage('Must contain organisation property'),
 	],
@@ -247,6 +248,8 @@ app.post(
 );
 
 app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
+
+app.get('/dcpu/:district', [isAuth, isNotCCI], getDCPUs);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);

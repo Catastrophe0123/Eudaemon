@@ -214,12 +214,12 @@ exports.uploadCCIFiles = async (req, res) => {
 				});
 			const fileurl = `https://firebasestorage.googleapis.com/v0/b/${fbconfig.storageBucket}/o/${fileName}?alt=media`;
 
-			let x = `${type}UploadedByUser`;
+			let a = `${type}UploadedByUser`;
 			let y = `${type}UploadedBy`;
 
 			let writeResult = await db.doc(`cci/${id}`).update({
 				[type]: fileUrl,
-				[x]: req.user.email,
+				[a]: req.user.email,
 				[y]: req.user.user_id,
 			});
 
