@@ -11,6 +11,10 @@ const {
 	postLogin,
 } = require('./controllers/authentication');
 
+const { admin, db } = require('./firebaseadmin');
+
+const firebase = require('./firebaseConfig');
+
 // CONTROLLERS
 const { createChild, updateChild, getChild } = require('./controllers/child');
 const { uploadFiles } = require('./controllers/fileUpload');
@@ -356,3 +360,112 @@ app.get('/po/:district', [isAuth, isNotCCI], getPOs);
 
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
+
+exports.createNotificationOnCCICreate = functions
+	.region('asia-east2')
+	.firestore.document('cci/{id}')
+	.onCreate(async (snapshot, context) => {
+		try {
+			console.log(context);
+			console.log(snapshot);
+
+			// notify CWC, DCPU and PO in the district
+
+			//dcpu
+			let dcpuDoc = await db
+				.collection('dcpu')
+				.where('district', '==', snapshot.data().district)
+				.get();
+			let dcpuIds = [];
+			for (const dcpu of dcpuDoc.docs) {
+				if (snapshot.data().createdBy === dcpu) {
+					continue;
+				}
+				dcpuIds.push(dcpu.id);
+			}
+
+			// cwc
+			let cwcDoc = await db
+				.collection('cwc')
+				.where('district', '==', snapshot.data().district)
+				.get();
+			let cwcIds = [];
+			for (const cwc of cwcDoc.docs) {
+				cwcIds.push(cwc.id);
+			}
+
+			//po
+			let poDoc = await db
+				.collection('po')
+				.where('district', '==', snapshot.data().district)
+				.get();
+			let poIds = [];
+			for (const cwc of poDoc.docs) {
+				poIds.push(cwc.id);
+			}
+
+			let x = await db.doc(`/notification/${snapshot.id}`).set({
+				// create the notification
+				createdAt: new Date().toISOString(),
+				recipients: [...dcpuIds, ...cwcIds, ...poIds],
+				sender: snapshot.id,
+				read: false,
+				type: 'CCICreation',
+			});
+		} catch (err) {
+			console.error(err);
+			return;
+		}
+	});
+
+exports.createNotificationOnChildAdded = functions
+	.region('asia-east2')
+	.firestore.document('children/{id}')
+	.onUpdate(async (change, context) => {
+		try {
+			let afterData = change.after.data();
+			let beforeData = change.before.data();
+			// check if child was added to their cci
+			if (!beforeData.cci && afterData.cci) {
+				// cci was added to the child. so notify the cci
+				let x = await db.collection('notification').add({
+					// create the notification
+					createdAt: new Date().toISOString(),
+					recipients: afterData.cci,
+					sender: change.after.id,
+					read: false,
+					type: 'ChildAddedToCCI',
+				});
+				return;
+			}
+
+			if (beforeData.cci !== afterData.cci) {
+				// cci was changed so notify the cci
+				let x = await db.collection('notification').add({
+					// create the notification
+					createdAt: new Date().toISOString(),
+					recipients: afterData.cci,
+					sender: change.after.id,
+					read: false,
+					type: 'ChildAddedToCCI',
+				});
+				return;
+			}
+
+			// if child data was updated
+
+			if (afterData.cci) {
+				let x = await db.collection('notification').add({
+					// create the notification
+					createdAt: new Date().toISOString(),
+					recipients: afterData.cci,
+					sender: change.after.id,
+					read: false,
+					type: 'ChildDataUpdated',
+				});
+				return;
+			}
+		} catch (err) {
+			return;
+		}
+	});
