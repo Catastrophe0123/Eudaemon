@@ -14,23 +14,38 @@ const {
 // CONTROLLERS
 const { createChild, updateChild, getChild } = require('./controllers/child');
 const { uploadFiles } = require('./controllers/fileUpload');
-const { createCCI, editCCI, getCCI } = require('./controllers/cci');
+const {
+	createCCI,
+	editCCI,
+	getCCI,
+	uploadCCIFiles,
+} = require('./controllers/cci');
 const {
 	createEmployee,
 	editEmployee,
 	getEmployee,
+	uploadEmployeeFiles,
 } = require('./controllers/employee');
 const {
 	createGuardian,
 	updateGuardian,
 	getGuardian,
-} = require('./controllers/guardian.js');
+} = require('./controllers/guardian');
+const {
+	getDCPUs,
+	createDCPU,
+	editDCPU,
+	deleteDCPU,
+} = require('./controllers/dcpu');
+const { createCWC, editCWC, deleteCWC, getCWCs } = require('./controllers/cwc');
+const { createPO, editPO, deletePO, getPOs } = require('./controllers/po');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
 var isNotCCI = require('./middlewares/isNotCCI');
 var isCorrectCCI = require('./middlewares/isCorrectCCI');
 var { isCorrectDCPU, isDCPU } = require('./middlewares/isDCPU');
+var isAdmin = require('./middlewares/isAdmin');
 
 // TODO: validation
 // returns the list of organisations in the db
@@ -67,7 +82,6 @@ app.post(
 );
 
 //LOGIN ROUTE
-// TODO: Validation
 /**
  * req.body = {
     email: String,
@@ -85,7 +99,7 @@ app.post(
 			.isLength({ min: 6, max: 20 })
 			.withMessage('Password must be between 6 and 20 characters'),
 		body('role').notEmpty().withMessage('Must contain role property'),
-		body('organistion')
+		body('organisation')
 			.notEmpty()
 			.withMessage('Must contain organisation property'),
 	],
@@ -93,11 +107,9 @@ app.post(
 );
 
 // create a new child in the database
-// TODO: Validation
 app.post('/child', [isAuth, isNotCCI], createChild);
 
 // update a child's data
-// TODO: validation
 app.put('/child/:id', [isAuth, isNotCCI], updateChild);
 
 // Upload child data : cannot be accessed by CCI
@@ -119,7 +131,6 @@ req.body = {
     inCharge: String,
     state: String,
 }
-    TODO: Validation
  */
 app.post(
 	'/cci',
@@ -160,7 +171,6 @@ app.post(
 // req.body = {
 //     district: String
 // }
-// TODO: Validation
 app.put(
 	'/cci/:id',
 	[
@@ -178,8 +188,13 @@ app.put(
 
 app.get('/cci/:id', [isAuth], getCCI);
 
+app.post(
+	'/cci/:id/upload/:district/:type',
+	[isAuth, isNotCCI, isDCPU],
+	uploadCCIFiles
+);
+
 // employee routes
-// TODO: validation
 app.post(
 	'/employees',
 	[
@@ -198,7 +213,6 @@ app.post(
 	createEmployee
 );
 
-// TODO: validation
 app.put(
 	'/employees/:id',
 	[
@@ -213,11 +227,16 @@ app.put(
 	editEmployee
 );
 
-// TODO: validation
 app.get('/employees/:id', [isAuth], getEmployee);
 
+// can be any type of file. Itll be associated with the employee
+app.post(
+	'/employees/:id/upload/:district/:type',
+	[isAuth, isDCPU],
+	uploadEmployeeFiles
+);
+
 // GUARDIAN ROUTES
-// TODO: Validation
 // childId
 app.post(
 	'/guardian',
@@ -237,6 +256,103 @@ app.post(
 );
 
 app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
+
+// DCPU ROUTES
+
+// populates dcpu - employees in the dcpu, inCharge and CCIs
+app.get('/dcpu/:district', [isAuth, isNotCCI], getDCPUs);
+
+// body = {
+// 	district: String,
+// 	name: String,
+// 	inCharge: String,
+// 	inChargeName: String
+// }
+app.post(
+	'/dcpu',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		body('inCharge')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a inCharge property'),
+		body('inChargeName')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a inChargeName property'),
+		isAuth,
+		isAdmin,
+	],
+	createDCPU
+);
+
+app.put('/dcpu/:id', [isAuth, isAdmin], editDCPU);
+
+app.delete('/dcpu/:id', [isAuth, isAdmin], deleteDCPU);
+
+// CWC CRUD
+
+app.get('/cwc/:district', [isAuth, isNotCCI], getCWCs);
+
+app.post(
+	'/cwc',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		body('inCharge')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a inCharge property'),
+		body('inChargeName')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a inChargeName property'),
+		isAuth,
+		isAdmin,
+	],
+	createCWC
+);
+
+app.put('/cwc/:id', [isAuth, isAdmin], editCWC);
+
+app.delete('/cwc/:id', [isAuth, isAdmin], deleteCWC);
+
+// PO CRUD
+
+app.post(
+	'/po',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		isAuth,
+	],
+	createPO
+);
+
+app.put('/po/:id', [isAuth, isAdmin], editPO);
+
+app.delete('/po/:id', [isAuth, isAdmin], deletePO);
+
+app.get('/po/:district', [isAuth, isNotCCI], getPOs);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);

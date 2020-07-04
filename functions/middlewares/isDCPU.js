@@ -18,7 +18,6 @@ exports.isCorrectDCPU = async (req, res, next) => {
 		return res.status(500).json({ error: 'the dcpu does not exist' });
 	} else {
 		let dcpuData = doc.data();
-		console.log('dcpu data from middleware: ', dcpuData);
 		if (dcpuData.district === cciDistrict) {
 			req.dcpuData = dcpuData;
 			return next();
