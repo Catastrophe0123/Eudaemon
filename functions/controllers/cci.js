@@ -159,6 +159,7 @@ exports.getCCI = async (req, res) => {
 		let notificationDoc = await db
 			.collection('notification')
 			.where('recipients', 'array-contains', id)
+			.orderBy('createdAt', 'desc')
 			.get();
 		let notificationData = notificationDoc.docs;
 		data['notifications'] = notificationData;
