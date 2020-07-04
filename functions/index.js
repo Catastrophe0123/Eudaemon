@@ -38,6 +38,7 @@ const {
 	deleteDCPU,
 } = require('./controllers/dcpu');
 const { createCWC, editCWC, deleteCWC, getCWCs } = require('./controllers/cwc');
+const { createPO, editPO, deletePO, getPOs } = require('./controllers/po');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -328,6 +329,30 @@ app.post(
 app.put('/cwc/:id', [isAuth, isAdmin], editCWC);
 
 app.delete('/cwc/:id', [isAuth, isAdmin], deleteCWC);
+
+// PO CRUD
+
+app.post(
+	'/po',
+	[
+		body('district')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a district property'),
+		body('name')
+			.exists()
+			.notEmpty()
+			.withMessage('Must have a name property'),
+		isAuth,
+	],
+	createPO
+);
+
+app.put('/po/:id', [isAuth, isAdmin], editPO);
+
+app.delete('/po/:id', [isAuth, isAdmin], deletePO);
+
+app.get('/po/:district', [isAuth, isNotCCI], getPOs);
 
 exports.api = functions.https.onRequest(app);
 // exports.api = functions.region('asia-east2').https.onRequest(app);
