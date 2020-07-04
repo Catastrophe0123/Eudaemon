@@ -1,8 +1,14 @@
 var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
+const { validationResult } = require('express-validator');
 
 exports.createCWC = async (req, res) => {
 	// create a dcpu
+
+	const errors = validationResult(req);
+	if (!errors.isEmpty()) {
+		return res.status(400).send(errors.array());
+	}
 
 	let name = req.body.name;
 
