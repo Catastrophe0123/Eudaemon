@@ -42,7 +42,13 @@ const {
 	editDCPU,
 	deleteDCPU,
 } = require('./controllers/dcpu');
-const { createCWC, editCWC, deleteCWC, getCWCs } = require('./controllers/cwc');
+const {
+	getCWC,
+	createCWC,
+	editCWC,
+	deleteCWC,
+	getCWCs,
+} = require('./controllers/cwc');
 const { createPO, editPO, deletePO, getPOs } = require('./controllers/po');
 
 // MIDDLEWARES
@@ -305,8 +311,9 @@ app.put('/dcpu/:id', [isAuth, isAdmin], editDCPU);
 app.delete('/dcpu/:id', [isAuth, isAdmin], deleteDCPU);
 
 // CWC CRUD
+app.get('/cwc/:id', [isAuth, isNotCCI], getCWC);
 
-app.get('/cwc/:district', [isAuth, isNotCCI], getCWCs);
+app.get('/cwc', [isAuth, isNotCCI], getCWCs);
 
 app.post(
 	'/cwc',

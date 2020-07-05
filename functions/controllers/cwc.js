@@ -2,6 +2,33 @@ var { admin, db } = require('../firebaseadmin');
 const firebase = require('../firebaseConfig');
 const { validationResult } = require('express-validator');
 
+exports.getCWC = async (req, res) => {
+	let id = req.params.id;
+	try {
+		let doc = await db.doc(`cwc/${id}`).get();
+		if (!doc.exists) {
+			return res.status(400).json({ error: 'Invalid ID' });
+		}
+
+		let data = doc.data();
+
+		if (req.user.organisation === id) {
+			// get notifications for the guy
+			let notificationDoc = await db
+				.collection('notification')
+				.where('recipients', 'array-contains', id)
+				.orderBy('createdAt', 'desc')
+				.get();
+			let notificationData = notificationDoc.docs;
+			data['notifications'] = notificationData;
+		}
+		return res.status(200).json(data);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
+
 exports.createCWC = async (req, res) => {
 	// create a dcpu
 
@@ -59,7 +86,7 @@ exports.deleteCWC = async (req, res) => {
 };
 
 exports.getCWCs = async (req, res) => {
-	let district = req.params.district;
+	let district = req.query.district;
 
 	// populate inCharge and CCIs
 
