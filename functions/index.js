@@ -36,12 +36,19 @@ const {
 	getGuardian,
 } = require('./controllers/guardian');
 const {
+	getDCPU,
 	getDCPUs,
 	createDCPU,
 	editDCPU,
 	deleteDCPU,
 } = require('./controllers/dcpu');
-const { createCWC, editCWC, deleteCWC, getCWCs } = require('./controllers/cwc');
+const {
+	getCWC,
+	createCWC,
+	editCWC,
+	deleteCWC,
+	getCWCs,
+} = require('./controllers/cwc');
 const { createPO, editPO, deletePO, getPOs } = require('./controllers/po');
 
 // MIDDLEWARES
@@ -263,8 +270,10 @@ app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
 
 // DCPU ROUTES
 
+app.get('/dcpu/:id', [isAuth, isNotCCI], getDCPU);
+
 // populates dcpu - employees in the dcpu, inCharge and CCIs
-app.get('/dcpu/:district', [isAuth, isNotCCI], getDCPUs);
+app.get('/dcpu', [isAuth, isNotCCI], getDCPUs);
 
 // body = {
 // 	district: String,
@@ -302,8 +311,9 @@ app.put('/dcpu/:id', [isAuth, isAdmin], editDCPU);
 app.delete('/dcpu/:id', [isAuth, isAdmin], deleteDCPU);
 
 // CWC CRUD
+app.get('/cwc/:id', [isAuth, isNotCCI], getCWC);
 
-app.get('/cwc/:district', [isAuth, isNotCCI], getCWCs);
+app.get('/cwc', [isAuth, isNotCCI], getCWCs);
 
 app.post(
 	'/cwc',
