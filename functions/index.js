@@ -36,6 +36,7 @@ const {
 	getGuardian,
 } = require('./controllers/guardian');
 const {
+	getDCPU,
 	getDCPUs,
 	createDCPU,
 	editDCPU,
@@ -263,8 +264,10 @@ app.put('/guardian/:id', [isAuth, isNotCCI], updateGuardian);
 
 // DCPU ROUTES
 
+app.get('/dcpu/:id', [isAuth, isNotCCI], getDCPU);
+
 // populates dcpu - employees in the dcpu, inCharge and CCIs
-app.get('/dcpu/:district', [isAuth, isNotCCI], getDCPUs);
+app.get('/dcpu', [isAuth, isNotCCI], getDCPUs);
 
 // body = {
 // 	district: String,

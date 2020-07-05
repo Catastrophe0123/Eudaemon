@@ -3,8 +3,45 @@ const firebase = require('../firebaseConfig');
 
 const { validationResult } = require('express-validator');
 
+exports.getDCPU = async (req, res) => {
+	let id = req.params.id;
+	try {
+		let doc = await db.doc(`dcpu/${id}`).get();
+		if (!doc.exists) {
+			return res.status(400).json({ error: 'Invalid ID' });
+		}
+
+		let data = doc.data();
+
+		// let cciDocs = await db.collection("cci").where(dcpu, "==", id ).get()
+		// let ccis = []
+		// if(!cciDocs.empty){
+		// 	let cciDatas = cciDocs.docs
+		// 	cciDatas.forEach(x => {
+		// 		ccis.push(x.data())
+		// 	})
+		// 	data["ccis"] = ccis
+		// }
+
+		if (req.user.organisation === id) {
+			// get notifications for the guy
+			let notificationDoc = await db
+				.collection('notification')
+				.where('recipients', 'array-contains', id)
+				.orderBy('createdAt', 'desc')
+				.get();
+			let notificationData = notificationDoc.docs;
+			data['notifications'] = notificationData;
+		}
+		return res.status(200).json(data);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
+
 exports.getDCPUs = async (req, res) => {
-	let district = req.params.district;
+	let district = req.query.district;
 	// we have the district
 
 	// populate => cci, employees,
