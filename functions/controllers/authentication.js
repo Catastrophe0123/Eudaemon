@@ -91,10 +91,29 @@ exports.postLogin = async (req, res) => {
 		return res.status(400).send(errors.array());
 	}
 
-	let availableRoles = ['CCI', 'CWC', 'DCPU', 'PO'];
+	let role = req.body.role;
+
+	let availableRoles = ['CCI', 'CWC', 'DCPU', 'PO', 'ADMIN'];
 
 	if (!availableRoles.includes(req.body.role)) {
 		return res.status(400).json({ error: 'invalid role' });
+	}
+
+	if (role === 'ADMIN') {
+		try {
+			const user = {
+				email: req.body.email,
+				password: req.body.password,
+			};
+			let data = await firebase
+				.auth()
+				.signInWithEmailAndPassword(user.email, user.password);
+			let token = await data.user.getIdToken();
+			return res.status(200).json({ token: token });
+		} catch (err) {
+			console.error(err);
+			return res.status(400).json({ error: err.message });
+		}
 	}
 
 	try {
@@ -102,8 +121,14 @@ exports.postLogin = async (req, res) => {
 			email: req.body.email,
 			password: req.body.password,
 		};
-		let role = req.body.role;
+		let roleLower = req.body.role.toLowerCase();
 		let organisation = req.body.organisation;
+
+		// before auth - check if organisation is correct
+		let listDocs = await db.collection(roleLower).listDocuments();
+		if (!listDocs.includes(organisation)) {
+			return res.status(400).json({ error: 'invalid organisation' });
+		}
 
 		let data = await firebase
 			.auth()

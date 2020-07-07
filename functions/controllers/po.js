@@ -3,6 +3,41 @@ const firebase = require('../firebaseConfig');
 
 const { validationResult } = require('express-validator');
 
+exports.getPO = async () => {
+	// get a particular PO
+
+	let id = req.params.id;
+	try {
+		let doc = await db.doc(`po/${id}`).get();
+		if (!doc.exists) {
+			return res.status(400).json({ error: 'Invalid ID' });
+		}
+
+		let data = doc.data();
+
+		if (req.user.organisation === id) {
+			// get notifications for the guy
+			let notificationDoc = await db
+				.collection('notification')
+				.where('recipients', 'array-contains', id)
+				.orderBy('createdAt', 'desc')
+				.get();
+			let notifications = [];
+			let notificationData = notificationDoc.docs;
+			for (const notif of notificationData) {
+				let x = { ...notif.data() };
+				x['id'] = notif.id;
+				notifications.push({ ...x });
+			}
+			data['notifications'] = notifications;
+		}
+		return res.status(200).json(data);
+	} catch (err) {
+		console.error(err);
+		return res.status(500).json({ error: err.message });
+	}
+};
+
 exports.createPO = async (req, res) => {
 	// create a PO
 	const errors = validationResult(req);
@@ -53,7 +88,7 @@ exports.deletePO = async (req, res) => {
 
 exports.getPOs = async (req, res) => {
 	try {
-		let district = req.params.district;
+		let district = req.query.district;
 		let doc = await db
 			.collection('po')
 			.where('district', '==', district)
