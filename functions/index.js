@@ -33,7 +33,7 @@ const {
 const {
 	createGuardian,
 	updateGuardian,
-	getGuardian,
+	// getGuardian,
 } = require('./controllers/guardian');
 const {
 	getDCPU,
@@ -56,6 +56,7 @@ const {
 	getPOs,
 	getPO,
 } = require('./controllers/po');
+const { markNotificationsRead } = require('./controllers/notifications');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -375,6 +376,8 @@ app.delete('/po/:id', [isAuth, isAdmin], deletePO);
 app.get('/po/:id', [isAuth, isNotCCI], getPO);
 app.get('/po', [isAuth, isNotCCI], getPOs);
 
+app.post('/notifications', [isAuth], markNotificationsRead);
+
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
 
@@ -421,7 +424,7 @@ exports.createNotificationOnCCICreate = functions
 				poIds.push(cwc.id);
 			}
 
-			let x = await db.doc(`/notification/${snapshot.id}`).set({
+			let x = await db.collection('notification').add({
 				// create the notification
 				createdAt: new Date().toISOString(),
 				recipients: [...dcpuIds, ...cwcIds, ...poIds],
@@ -535,7 +538,7 @@ exports.createNotificationOnDCPUCreated = functions
 
 exports.createNotificationOnCWCCreated = functions
 	.region('asia-east2')
-	.firestore.document('po/{id}')
+	.firestore.document('cwc/{id}')
 	.onCreate(async (snapshot, context) => {
 		let dcpuDoc = await db
 			.collection('dcpu')
@@ -581,7 +584,7 @@ exports.createNotificationOnCWCCreated = functions
 
 exports.createNotificationOnPOCreated = functions
 	.region('asia-east2')
-	.firestore.document('dcpu/{id}')
+	.firestore.document('po/{id}')
 	.onCreate(async (snapshot, context) => {
 		let dcpuDoc = await db
 			.collection('dcpu')
@@ -624,3 +627,10 @@ exports.createNotificationOnPOCreated = functions
 			type: 'POCreation',
 		});
 	});
+
+// notifications for
+// CCI created - DCPU, CWC and PO in the district are notified
+// Child added to cci or data is updated - The CCI where the child is placed in is notified
+// DCPU created - other DCPUs, POs and CWCs in the district are notified
+// PO created - other DCPUs, POs and CWCs in the district are notified
+// CWC created - other DCPUs, POs and CWCs in the district are notified

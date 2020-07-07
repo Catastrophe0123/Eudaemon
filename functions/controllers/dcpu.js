@@ -33,7 +33,9 @@ exports.getDCPU = async (req, res) => {
 			let notifications = [];
 			let notificationData = notificationDoc.docs;
 			for (const notif of notificationData) {
-				notifications.push(notif.data());
+				let x = notif.data();
+				x['id'] = notif.id;
+				notifications.push({ ...x });
 			}
 			data['notifications'] = notifications;
 		}
