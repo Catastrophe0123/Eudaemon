@@ -30,8 +30,12 @@ exports.getDCPU = async (req, res) => {
 				.where('recipients', 'array-contains', id)
 				.orderBy('createdAt', 'desc')
 				.get();
+			let notifications = [];
 			let notificationData = notificationDoc.docs;
-			data['notifications'] = notificationData;
+			for (const notif of notificationData) {
+				notifications.push(notif.data());
+			}
+			data['notifications'] = notifications;
 		}
 		return res.status(200).json(data);
 	} catch (err) {

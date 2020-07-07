@@ -49,7 +49,13 @@ const {
 	deleteCWC,
 	getCWCs,
 } = require('./controllers/cwc');
-const { createPO, editPO, deletePO, getPOs } = require('./controllers/po');
+const {
+	createPO,
+	editPO,
+	deletePO,
+	getPOs,
+	getPO,
+} = require('./controllers/po');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -366,7 +372,8 @@ app.put('/po/:id', [isAuth, isAdmin], editPO);
 
 app.delete('/po/:id', [isAuth, isAdmin], deletePO);
 
-app.get('/po/:district', [isAuth, isNotCCI], getPOs);
+app.get('/po/:id', [isAuth, isNotCCI], getPO);
+app.get('/po', [isAuth, isNotCCI], getPOs);
 
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
