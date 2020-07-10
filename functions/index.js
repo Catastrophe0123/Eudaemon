@@ -365,6 +365,7 @@ app.post(
 			.notEmpty()
 			.withMessage('Must have a name property'),
 		isAuth,
+		isAdmin,
 	],
 	createPO
 );
@@ -582,8 +583,6 @@ exports.createNotificationOnCWCCreated = functions
 		});
 	});
 
-exports.createNotificationOnPOCreated = functions
-	.region('asia-east2')
 	.firestore.document('po/{id}')
 	.onCreate(async (snapshot, context) => {
 		let dcpuDoc = await db
@@ -628,9 +627,27 @@ exports.createNotificationOnPOCreated = functions
 		});
 	});
 
+exports.createNotificationOnCCIUpdated = functions.region('asia-east2')
+.firestore.document('cci/{id}').onUpdate((change, context) => {
+	// code
+	// notify the cci which was updated
+	let x = await db.collection('notification').add({
+		// create the notification
+		createdAt: new Date().toISOString(),
+		recipients: [change.after.id],
+		sender: change.after.id,
+		read: false,
+		type: 'CCIUpdated',
+	});
+})
+
 // notifications for
 // CCI created - DCPU, CWC and PO in the district are notified
 // Child added to cci or data is updated - The CCI where the child is placed in is notified
 // DCPU created - other DCPUs, POs and CWCs in the district are notified
 // PO created - other DCPUs, POs and CWCs in the district are notified
 // CWC created - other DCPUs, POs and CWCs in the district are notified
+// CCI updated - that CCI is notified that their data was updated
+// all updates
+// all messages
+// all deletes
