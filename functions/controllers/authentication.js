@@ -7,22 +7,83 @@ exports.getLogin = async (req, res) => {
 	try {
 		let result = {};
 
-		let cwc = await db.collection('/cwc').listDocuments();
-		let values = [];
-		cwc.forEach((el) => {
-			values.push(el.id);
-		});
-		result['cwc'] = values;
+		let district = req.query.district;
 
-		let cci = await db.collection('/cci').listDocuments();
-		values = [];
-		cci.forEach((el) => values.push(el.id));
-		result['cci'] = values;
+		if (!district) {
+			return res
+				.status(400)
+				.json({ error: 'must a district query param' });
+		}
 
-		let dcpu = await db.collection('/dcpu').listDocuments();
-		values = [];
-		dcpu.forEach((el) => values.push(el.id));
-		result['dcpu'] = values;
+		// PO
+		let pos = await db
+			.collection('po')
+			.where('district', '==', district)
+			.get();
+
+		let poData = pos.docs;
+		let POs = [];
+		for (const PO of poData) {
+			console.log(PO.data());
+			POs.push(PO.data());
+		}
+		result['PO'] = POs;
+
+		// CWC
+		let cwcs = await db
+			.collection('cwc')
+			.where('district', '==', district)
+			.get();
+		let cwcData = cwcs.docs;
+		let CWCs = [];
+		for (const cwc of cwcData) {
+			console.log(cwc.data());
+			CWCs.push(cwc.data());
+		}
+		result['CWC'] = CWCs;
+
+		// DCPU
+		let dcpus = await db
+			.collection('dcpu')
+			.where('district', '==', district)
+			.get();
+		let dcpuData = dcpus.docs;
+		let DCPUs = [];
+		for (const dcpu of dcpuData) {
+			console.log(dcpu.data());
+			DCPUs.push(dcpu.data());
+		}
+		result['DCPU'] = DCPUs;
+
+		// CCI
+		let ccis = await db
+			.collection('cwc')
+			.where('district', '==', district)
+			.get();
+		let cciData = ccis.docs;
+		let CCIs = [];
+		for (const cci of cciData) {
+			console.log(cci.data());
+			CCIs.push(cci.data());
+		}
+		result['CCI'] = CCIs;
+
+		// let cwc = await db.collection('/cwc').listDocuments();
+		// let values = [];
+		// cwc.forEach((el) => {
+		// 	values.push(el.id);
+		// });
+		// result['cwc'] = values;
+
+		// let cci = await db.collection('/cci').listDocuments();
+		// values = [];
+		// cci.forEach((el) => values.push(el.id));
+		// result['cci'] = values;
+
+		// let dcpu = await db.collection('/dcpu').listDocuments();
+		// values = [];
+		// dcpu.forEach((el) => values.push(el.id));
+		// result['dcpu'] = values;
 
 		return res.status(200).json(result);
 	} catch (err) {
