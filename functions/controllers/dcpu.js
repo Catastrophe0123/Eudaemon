@@ -50,6 +50,10 @@ exports.getDCPUs = async (req, res) => {
 	let district = req.query.district;
 	// we have the district
 
+	if (!district) {
+		return res.status(400).json({ error: 'must a district query param' });
+	}
+
 	// populate => cci, employees,
 
 	try {

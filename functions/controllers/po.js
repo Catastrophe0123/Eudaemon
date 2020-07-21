@@ -89,6 +89,13 @@ exports.deletePO = async (req, res) => {
 exports.getPOs = async (req, res) => {
 	try {
 		let district = req.query.district;
+
+		if (!district) {
+			return res
+				.status(400)
+				.json({ error: 'must a district query param' });
+		}
+
 		let doc = await db
 			.collection('po')
 			.where('district', '==', district)
