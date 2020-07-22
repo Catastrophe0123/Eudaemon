@@ -25,7 +25,9 @@ exports.getLogin = async (req, res) => {
 		let POs = [];
 		for (const PO of poData) {
 			console.log(PO.data());
-			POs.push(PO.data());
+			let data = PO.data();
+			data['id'] = PO.id;
+			POs.push(data);
 		}
 		result['PO'] = POs;
 
@@ -37,8 +39,10 @@ exports.getLogin = async (req, res) => {
 		let cwcData = cwcs.docs;
 		let CWCs = [];
 		for (const cwc of cwcData) {
+			let data = cwc.data();
+			data['id'] = cwc.id;
 			console.log(cwc.data());
-			CWCs.push(cwc.data());
+			CWCs.push(data);
 		}
 		result['CWC'] = CWCs;
 
@@ -51,20 +55,24 @@ exports.getLogin = async (req, res) => {
 		let DCPUs = [];
 		for (const dcpu of dcpuData) {
 			console.log(dcpu.data());
-			DCPUs.push(dcpu.data());
+			let data = dcpu.data();
+			data['id'] = dcpu.id;
+			DCPUs.push(data);
 		}
 		result['DCPU'] = DCPUs;
 
 		// CCI
 		let ccis = await db
-			.collection('cwc')
+			.collection('cci')
 			.where('district', '==', district)
 			.get();
 		let cciData = ccis.docs;
 		let CCIs = [];
 		for (const cci of cciData) {
 			console.log(cci.data());
-			CCIs.push(cci.data());
+			let data = cci.data();
+			data['id'] = cci.id;
+			CCIs.push(data);
 		}
 		result['CCI'] = CCIs;
 
