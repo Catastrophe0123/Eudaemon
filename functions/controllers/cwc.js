@@ -94,6 +94,9 @@ exports.deleteCWC = async (req, res) => {
 exports.getCWCs = async (req, res) => {
 	let district = req.query.district;
 
+	if (!district) {
+		return res.status(400).json({ error: 'must a district query param' });
+	}
 	// populate inCharge and CCIs
 
 	try {

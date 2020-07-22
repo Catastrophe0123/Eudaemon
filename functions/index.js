@@ -5,6 +5,14 @@ const { body } = require('express-validator');
 const express = require('express');
 const app = express();
 
+/**
+ * we use
+ * firestore
+ * storage bucket
+ * authentication
+ *
+ */
+
 const {
 	getLogin,
 	postSignup,
@@ -23,6 +31,7 @@ const {
 	editCCI,
 	getCCI,
 	uploadCCIFiles,
+	getChildrenInCCI,
 } = require('./controllers/cci');
 const {
 	createEmployee,
@@ -57,6 +66,10 @@ const {
 	getPO,
 } = require('./controllers/po');
 const { markNotificationsRead } = require('./controllers/notifications');
+const {
+	getChildrenData,
+	uploadAttendance,
+} = require('./controllers/attendance');
 
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
@@ -185,6 +198,8 @@ app.post(
 	],
 	createCCI
 );
+
+app.get('/cci/children', [isAuth, isCorrectCCI], getChildrenInCCI);
 
 // req.body = {
 //     district: String
@@ -378,6 +393,11 @@ app.get('/po/:id', [isAuth, isNotCCI], getPO);
 app.get('/po', [isAuth, isNotCCI], getPOs);
 
 app.post('/notifications', [isAuth], markNotificationsRead);
+
+// TODO: ATTENDANCE ROUTES
+app.get('/attendance/children', getChildrenData);
+
+app.post('/attendance/children', uploadAttendance);
 
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
@@ -583,6 +603,8 @@ exports.createNotificationOnCWCCreated = functions
 		});
 	});
 
+exports.createNotificationOnPOCreated = functions
+	.region('asia-east2')
 	.firestore.document('po/{id}')
 	.onCreate(async (snapshot, context) => {
 		let dcpuDoc = await db
@@ -627,19 +649,21 @@ exports.createNotificationOnCWCCreated = functions
 		});
 	});
 
-exports.createNotificationOnCCIUpdated = functions.region('asia-east2')
-.firestore.document('cci/{id}').onUpdate((change, context) => {
-	// code
-	// notify the cci which was updated
-	let x = await db.collection('notification').add({
-		// create the notification
-		createdAt: new Date().toISOString(),
-		recipients: [change.after.id],
-		sender: change.after.id,
-		read: false,
-		type: 'CCIUpdated',
+exports.createNotificationOnCCIUpdated = functions
+	.region('asia-east2')
+	.firestore.document('cci/{id}')
+	.onUpdate(async (change, context) => {
+		// code
+		// notify the cci which was updated
+		let x = await db.collection('notification').add({
+			// create the notification
+			createdAt: new Date().toISOString(),
+			recipients: [change.after.id],
+			sender: change.after.id,
+			read: false,
+			type: 'CCIUpdated',
+		});
 	});
-})
 
 // notifications for
 // CCI created - DCPU, CWC and PO in the district are notified
