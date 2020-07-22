@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import axios from 'axios';
+import { Redirect } from 'react-router-dom';
 
 export class Login extends Component {
 	state = {
@@ -12,7 +13,7 @@ export class Login extends Component {
 		role: 'DCPU',
 	};
 
-	componentDidMount = async () => {
+	componentDidMount = () => {
 		// initial get route
 		// let resp = await axios.get('/login');
 	};
@@ -116,6 +117,10 @@ export class Login extends Component {
 	};
 
 	render() {
+		if (localStorage.token && localStorage.role) {
+			return <Redirect to={`/${localStorage.role}`} />;
+		}
+
 		return (
 			<div>
 				<h1>LOGIN PAGE</h1>
