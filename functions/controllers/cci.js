@@ -173,6 +173,32 @@ exports.getCCI = async (req, res) => {
 	return res.status(200).json(data);
 };
 
+exports.getChildrenInCCI = async (req, res) => {
+	// code
+	try {
+		let cci = req.query.cci;
+		if (!cci) {
+			return res
+				.status(400)
+				.json({ error: 'cci must be passed as a query param' });
+		}
+
+		let result = [];
+		// get the children who are in the particular cci
+		let doc = await db.collection('children').where('cci', '==', cci).get();
+		let data = doc.docs;
+		data.forEach((child) => {
+			let data = child.data();
+			data['id'] = child.id;
+			result.push(data);
+		});
+		return res.status(200).json({ result });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
+	}
+};
+
 exports.uploadCCIFiles = async (req, res) => {
 	//code
 	const district = req.params.district;

@@ -31,6 +31,7 @@ const {
 	editCCI,
 	getCCI,
 	uploadCCIFiles,
+	getChildrenInCCI,
 } = require('./controllers/cci');
 const {
 	createEmployee,
@@ -197,6 +198,8 @@ app.post(
 	],
 	createCCI
 );
+
+app.get('/cci/children', [isAuth, isCorrectCCI], getChildrenInCCI);
 
 // req.body = {
 //     district: String
