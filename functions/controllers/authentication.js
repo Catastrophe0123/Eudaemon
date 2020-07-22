@@ -187,7 +187,10 @@ exports.postLogin = async (req, res) => {
 
 		// before auth - check if organisation is correct
 		let listDocs = await db.collection(roleLower).listDocuments();
-		if (!listDocs.includes(organisation)) {
+		let q = [];
+		listDocs.forEach((e) => q.push(e.id));
+		console.log(q);
+		if (!q.includes(organisation)) {
 			return res.status(400).json({ error: 'invalid organisation' });
 		}
 
