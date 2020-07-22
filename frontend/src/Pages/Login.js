@@ -92,7 +92,12 @@ export class Login extends Component {
 				console.log(resp.data);
 				let token = resp.data.token;
 				localStorage.setItem('token', `Bearer ${token}`);
-				this.setState({ loading: false, error: null });
+				localStorage.setItem('role', role);
+				localStorage.setItem('organisation', organisation);
+				this.props.setUserDataPostLogin(role, token, organisation);
+				this.setState({ loading: false, error: null }, () => {
+					this.props.history.push(`/${role}`);
+				});
 			}
 		} catch (err) {
 			console.log(err.response);
