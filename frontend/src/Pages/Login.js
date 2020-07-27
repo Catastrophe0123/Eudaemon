@@ -117,7 +117,7 @@ export class Login extends Component {
 	};
 
 	render() {
-		if (localStorage.token && localStorage.role) {
+		if (this.props.authenticated) {
 			return <Redirect to={`/${localStorage.role}`} />;
 		}
 
@@ -137,60 +137,67 @@ export class Login extends Component {
 				{this.state.error ? <p>{this.state.error}</p> : null}
 				{this.state.loading ? <p>Loading...</p> : null}
 				{/* role, organisation, email, password */}
-				<form action=''>
-					<label htmlFor='email'>Email : </label>
-					<input
-						id='email'
-						name='email'
-						onChange={this.onInputChangeHandler}
-						type='email'
-					/>
-					<label htmlFor='email'>Password : </label>
-					<input
-						id='password'
-						name='password'
-						onChange={this.onInputChangeHandler}
-						type='password'
-					/>
-					<label htmlFor='role'>Select your role</label>
-					<select
-						value={this.state.role}
-						onChange={this.onSelectInputHandler}
-						name='role'
-						id='role'>
-						<option value='DCPU'>DCPU</option>
-						<option value='CCI'>CCI</option>
-						<option value='CWC'>CWC</option>
-						<option value='PO'>PO</option>
-					</select>
-					<label htmlFor='organisation'>
-						Choose the name of your Organisation
-					</label>
-					<select
-						value={this.state.organisation}
-						onChange={this.onInputChangeHandler}
-						name='organisation'
-						id='organisation'>
-						{this.state.data
-							? this.state.data[this.state.role].map((el) => {
-									if (this.state.role === 'PO') {
+
+				{this.state.data && (
+					<form action=''>
+						<label htmlFor='email'>Email : </label>
+						<input
+							id='email'
+							name='email'
+							onChange={this.onInputChangeHandler}
+							type='email'
+						/>
+						<label htmlFor='email'>Password : </label>
+						<input
+							id='password'
+							name='password'
+							onChange={this.onInputChangeHandler}
+							type='password'
+						/>
+						<label htmlFor='role'>Select your role</label>
+						<select
+							value={this.state.role}
+							onChange={this.onSelectInputHandler}
+							name='role'
+							id='role'>
+							<option value='DCPU'>DCPU</option>
+							<option value='CCI'>CCI</option>
+							<option value='CWC'>CWC</option>
+							<option value='PO'>PO</option>
+						</select>
+						<label htmlFor='organisation'>
+							Choose the name of your Organisation
+						</label>
+						<select
+							value={this.state.organisation}
+							onChange={this.onInputChangeHandler}
+							name='organisation'
+							id='organisation'>
+							{this.state.data
+								? this.state.data[this.state.role].map((el) => {
+										if (this.state.role === 'PO') {
+											return (
+												<option value={el.id}>
+													{el.name}
+												</option>
+											);
+										}
 										return (
 											<option value={el.id}>
-												{el.name}
+												{el.id}
 											</option>
 										);
-									}
-									return (
-										<option value={el.id}>{el.id}</option>
-									);
-							  })
-							: null}
-					</select>
+								  })
+								: null}
+						</select>
 
-					<button onClick={this.onLoginSubmitHandler} type='submit'>
-						submit
-					</button>
-				</form>
+						<button
+							onClick={this.onLoginSubmitHandler}
+							type='submit'>
+							submit
+						</button>
+					</form>
+				)}
 			</div>
 		);
 	}
