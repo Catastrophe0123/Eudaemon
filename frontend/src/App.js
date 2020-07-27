@@ -15,22 +15,27 @@ export class App extends Component {
 	state = { authenticated: false };
 
 	setUserDataPostLogin = (role, token, organisation) => {
-		this.setState({ role, token, organisation }, () => {
-			setTimeout(() => {
-				// logout
-				localStorage.removeItem('token');
-				localStorage.removeItem('role');
-				localStorage.removeItem('organisation');
-				this.setState({
-					authenticated: false,
-					role: '',
-					token: '',
-					organisation: '',
-				});
-				console.log('logging out');
-				window.location.href = '/login';
-			}, 3600 * 1000);
-		});
+		this.setState(
+			{ role, token, organisation },
+			this.setTokenTimer(3600 * 1000)
+		);
+	};
+
+	setTokenTimer = (time) => () => {
+		setTimeout(() => {
+			// logout
+			localStorage.removeItem('token');
+			localStorage.removeItem('role');
+			localStorage.removeItem('organisation');
+			this.setState({
+				authenticated: false,
+				role: '',
+				token: '',
+				organisation: '',
+			});
+			console.log('logging out');
+			window.location.href = '/login';
+		}, time);
 	};
 
 	componentDidMount = () => {
@@ -42,6 +47,10 @@ export class App extends Component {
 				console.log('expired token');
 				authenticated = false;
 			} else {
+				let endTime = new Date(decodedToken.exp * 1000);
+				let startTime = new Date();
+				var milliseconds = endTime.getTime() - startTime.getTime();
+				this.setTokenTimer(milliseconds);
 				authenticated = true;
 			}
 			this.setState({ authenticated });
