@@ -506,6 +506,27 @@ exports.createNotificationOnChildAdded = functions
 				});
 				return;
 			}
+
+			if (
+				(!beforeData.review && afterData.review) ||
+				beforeData.review !== afterData.review
+			) {
+				// perform sentiment analysis
+				var Analyzer = require('natural').SentimentAnalyzer;
+				var stemmer = require('natural').PorterStemmer;
+				var analyzer = new Analyzer('English', stemmer, 'afinn');
+				// getSentiment expects an array of strings
+
+				let data = afterData.review.split(' ');
+				data = data.replace('.', '');
+				let sentimentValue = analyzer.getSentiment(data);
+				console.log(sentimentValue);
+				// 0.6666666666666666
+				let doc = await db
+					.doc(`children/${change.after.id}`)
+					.update({ sentiment: sentimentValue });
+				return;
+			}
 		} catch (err) {
 			return;
 		}
