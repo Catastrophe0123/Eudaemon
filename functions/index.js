@@ -517,11 +517,15 @@ exports.createNotificationOnChildAdded = functions
 				var analyzer = new Analyzer('English', stemmer, 'afinn');
 				// getSentiment expects an array of strings
 
-				let data = afterData.review.split(' ');
-				data = data.replace('.', '');
+				let data = afterData.review;
+
+				// remove punctuations
+				let data = data.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+
+				data.split(' ');
+
 				let sentimentValue = analyzer.getSentiment(data);
 				console.log(sentimentValue);
-				// 0.6666666666666666
 				let doc = await db
 					.doc(`children/${change.after.id}`)
 					.update({ sentiment: sentimentValue });
