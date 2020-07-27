@@ -120,7 +120,6 @@ export class Login extends Component {
 		if (this.props.authenticated) {
 			return <Redirect to={`/${localStorage.role}`} />;
 		}
-
 		return (
 			<div>
 				<h1>LOGIN PAGE</h1>
