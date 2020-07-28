@@ -6,6 +6,10 @@ import {
 	Redirect,
 } from 'react-router-dom';
 import AuthRoute from './Components/AuthRoute';
+import CCI from './Pages/CCI';
+import DCPU from './Pages/DCPU';
+import CWC from './Pages/CWC';
+import PO from './Pages/PO';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
@@ -85,7 +89,25 @@ export class App extends Component {
 							path='/CWC'
 							exact
 							authenticated={this.state.authenticated}
-							component={() => <h1>hello from cwc route</h1>}
+							component={CWC}
+						/>
+						<AuthRoute
+							path='/DCPU'
+							exact
+							authenticated={this.state.authenticated}
+							component={DCPU}
+						/>
+						<AuthRoute
+							path='/CCI'
+							exact
+							authenticated={this.state.authenticated}
+							component={CCI}
+						/>
+						<AuthRoute
+							path='/PO'
+							exact
+							authenticated={this.state.authenticated}
+							component={PO}
 						/>
 					</Switch>
 				</Router>
