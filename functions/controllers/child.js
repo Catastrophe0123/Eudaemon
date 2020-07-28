@@ -65,22 +65,45 @@ exports.updateChild = async (req, res) => {
 
 exports.getChild = async (req, res) => {
 	// we have the child's data in req.childData
+	try {
+		if (!req.childData) {
+			let doc = await db.doc(`children/${req.params.id}`).get();
+			if (!doc.exists) {
+				// invalid id i guess
+				return res
+					.status(400)
+					.json({ message: 'document does not exist. wrong id' });
+			} else {
+				// doc exists
+				let docData = doc.data();
+				req.childData = docData;
+			}
+		}
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
+	}
 
-	if (!req.childData.guardian) {
-		return res.status(200).json(req.childData);
-	} else {
-		// populate guardian
-		let guardianDoc = await db
-			.collection('guardians')
-			.doc(req.childData.guardian)
-			.get();
-		if (!guardianDoc.exists)
-			return res.status(200).json({
-				error: 'guardian data does not exist',
-				childData: req.childData,
-			});
-		let guardianData = guardianDoc.data();
-		req.childData['guardian'] = guardianData;
-		return res.status(200).json(req.childData);
+	try {
+		if (req.childData.guardian) {
+			// populate guardian
+			let guardianDoc = await db
+				.collection('guardians')
+				.doc(req.childData.guardian)
+				.get();
+			if (!guardianDoc.exists)
+				return res.status(200).json({
+					error: 'guardian data does not exist',
+					childData: req.childData,
+				});
+			let guardianData = guardianDoc.data();
+			req.childData['guardian'] = guardianData;
+			return res.status(200).json(req.childData);
+		} else {
+			return res.status(200).json(req.childData);
+		}
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
 	}
 };
