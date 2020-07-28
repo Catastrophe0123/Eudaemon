@@ -507,10 +507,13 @@ exports.createNotificationOnChildAdded = functions
 				return;
 			}
 
+			console.log('inside the cloud function of child added listener');
+
 			if (
 				(!beforeData.review && afterData.review) ||
 				beforeData.review !== afterData.review
 			) {
+				console.log('inside the sentiment analysis listener');
 				// perform sentiment analysis
 				var Analyzer = require('natural').SentimentAnalyzer;
 				var stemmer = require('natural').PorterStemmer;
@@ -522,10 +525,11 @@ exports.createNotificationOnChildAdded = functions
 				// remove punctuations
 				data = data.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
 
-				data.split(' ');
+				data = data.split(' ');
 
 				let sentimentValue = analyzer.getSentiment(data);
-				console.log(sentimentValue);
+				console.log('got the sentiment value');
+				console.log(`value is : ${sentimentValue}`);
 				let doc = await db
 					.doc(`children/${change.after.id}`)
 					.update({ sentiment: sentimentValue });
