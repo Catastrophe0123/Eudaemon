@@ -507,8 +507,6 @@ exports.createNotificationOnChildAdded = functions
 				return;
 			}
 
-			console.log('inside the cloud function of child added listener');
-
 			if (
 				(!beforeData.review && afterData.review) ||
 				beforeData.review !== afterData.review

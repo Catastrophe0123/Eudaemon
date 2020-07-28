@@ -52,6 +52,7 @@ export class Login extends Component {
 					loading: false,
 				});
 			} else {
+				console.log(data['DCPU']);
 				this.setState({
 					loading: false,
 					error: null,
