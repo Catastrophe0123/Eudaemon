@@ -3,7 +3,7 @@ const firebase = require('../firebaseConfig');
 
 const { validationResult } = require('express-validator');
 
-exports.getPO = async () => {
+exports.getPO = async (req, res) => {
 	// get a particular PO
 
 	let id = req.params.id;
