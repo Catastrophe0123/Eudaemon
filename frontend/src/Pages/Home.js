@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import Axios from 'axios';
+import Axios from '../util/axiosinstance';
 import { Link } from 'react-router-dom';
 
 export class Home extends Component {
@@ -45,7 +45,9 @@ export class Home extends Component {
 					{this.state.showPO && (
 						<div>
 							{this.state.POData.po.map((el) => {
-								return <Link to={`/`}>{el.name}</Link>;
+								return (
+									<Link to={`/po/${el.id}`}>{el.name}</Link>
+								);
 							})}
 						</div>
 					)}

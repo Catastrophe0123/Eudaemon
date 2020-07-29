@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import axios from 'axios';
+import axios from '../util/axiosinstance';
 import { Redirect } from 'react-router-dom';
 import Axios from 'axios';
 
@@ -98,7 +98,7 @@ export class Login extends Component {
 				localStorage.setItem('role', role);
 				localStorage.setItem('organisation', organisation);
 				localStorage.setItem('district', this.state.district);
-				Axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+				axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 				this.props.setUserDataPostLogin(
 					role,
 					token,

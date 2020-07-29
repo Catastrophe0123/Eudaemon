@@ -14,7 +14,8 @@ import Home from './Pages/Home';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
-import axios from 'axios';
+// import axios from 'axios';
+import axios from './util/axiosinstance';
 
 export class App extends Component {
 	state = { authenticated: false, role: '', organisation: '', district: '' };
@@ -92,7 +93,12 @@ export class App extends Component {
 							authenticated={this.state.authenticated}
 							component={Home}
 						/>
-						)
+						<AuthRoute
+							path='/PO/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={PO}
+						/>
 						<Route
 							exact
 							path='/login'
@@ -123,12 +129,6 @@ export class App extends Component {
 							exact
 							authenticated={this.state.authenticated}
 							component={CCI}
-						/>
-						<AuthRoute
-							path='/PO'
-							exact
-							authenticated={this.state.authenticated}
-							component={PO}
 						/>
 					</Switch>
 				</Router>
