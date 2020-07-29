@@ -3,8 +3,15 @@ import { Route, Redirect } from 'react-router-dom';
 
 export class AuthRoute extends Component {
 	render() {
-		let { authenticated, component: Render, ...rest } = this.props;
-
+		let {
+			authenticated,
+			// token,
+			// role,
+			// organisation,
+			component: Render,
+			...rest
+		} = this.props;
+		console.log(this.props.authenticated);
 		return (
 			<Route
 				{...rest}
@@ -12,7 +19,14 @@ export class AuthRoute extends Component {
 					authenticated === false ? (
 						<Redirect to='/login' />
 					) : (
-						<Render {...props} />
+						<Render
+							{...props}
+							{...rest}
+							authenticated={authenticated}
+							// token={token}
+							// role={role}
+							// organisation={organisation}
+						/>
 					)
 				}
 			/>

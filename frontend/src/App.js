@@ -10,17 +10,19 @@ import CCI from './Pages/CCI';
 import DCPU from './Pages/DCPU';
 import CWC from './Pages/CWC';
 import PO from './Pages/PO';
+import Home from './Pages/Home';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
 import axios from 'axios';
 
 export class App extends Component {
-	state = { authenticated: false };
+	state = { authenticated: false, role: '', organisation: '', district: '' };
 
-	setUserDataPostLogin = (role, token, organisation) => {
+	setUserDataPostLogin = (role, token, organisation, district) => {
+		axios.defaults.headers['Authorization'] = `Bearer ${token}`;
 		this.setState(
-			{ role, token, organisation },
+			{ role, token, organisation, authenticated: true, district },
 			this.setTokenTimer(3600 * 1000)
 		);
 	};
@@ -36,6 +38,7 @@ export class App extends Component {
 				role: '',
 				token: '',
 				organisation: '',
+				district: '',
 			});
 			console.log('logging out');
 			window.location.href = '/login';
@@ -56,6 +59,13 @@ export class App extends Component {
 				var milliseconds = endTime.getTime() - startTime.getTime();
 				this.setTokenTimer(milliseconds);
 				authenticated = true;
+				this.setState({
+					token: token,
+					role: decodedToken.role,
+					organisation: decodedToken.organisation,
+					district: localStorage.district,
+				});
+				axios.defaults.headers['Authorization'] = token;
 			}
 			this.setState({ authenticated });
 		}
@@ -72,6 +82,17 @@ export class App extends Component {
 			<div>
 				<Router>
 					<Switch>
+						<AuthRoute
+							path='/'
+							token={this.state.token}
+							role={this.state.role}
+							organisation={this.state.organisation}
+							district={this.state.district}
+							exact
+							authenticated={this.state.authenticated}
+							component={Home}
+						/>
+						)
 						<Route
 							exact
 							path='/login'

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import { Redirect } from 'react-router-dom';
+import Axios from 'axios';
 
 export class Login extends Component {
 	state = {
@@ -96,9 +97,17 @@ export class Login extends Component {
 				localStorage.setItem('token', `Bearer ${token}`);
 				localStorage.setItem('role', role);
 				localStorage.setItem('organisation', organisation);
-				this.props.setUserDataPostLogin(role, token, organisation);
+				localStorage.setItem('district', this.state.district);
+				Axios.defaults.headers['Authorization'] = `Bearer ${token}`;
+				this.props.setUserDataPostLogin(
+					role,
+					token,
+					organisation,
+					this.state.district
+				);
 				this.setState({ loading: false, error: null }, () => {
-					this.props.history.push(`/${role}`);
+					// this.props.history.push(`/${role}`);
+					this.props.history.push(`/`);
 				});
 			}
 		} catch (err) {
@@ -119,7 +128,7 @@ export class Login extends Component {
 
 	render() {
 		if (this.props.authenticated) {
-			return <Redirect to={`/${localStorage.role}`} />;
+			return <Redirect to={'/'} />;
 		}
 		return (
 			<div>
