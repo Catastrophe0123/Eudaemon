@@ -63,6 +63,12 @@ export class Child extends Component {
 				);
 			} else if (key === 'photo') {
 				continue;
+			} else if (key === 'guardianName') {
+				x.push(
+					<Link to={`/guardian/${this.state.data['guardian']}`}>
+						{key}: {value}
+					</Link>
+				);
 			} else {
 				x.push(
 					<p>

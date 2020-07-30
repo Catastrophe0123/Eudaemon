@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { Link } from 'react-router-dom';
 
 export class Guardian extends Component {
 	state = { data: null };
@@ -70,10 +71,47 @@ export class Guardian extends Component {
 	};
 
 	render() {
+		dayjs.extend(relativeTime);
+
 		return (
 			<div>
 				<h1>show guardian data route</h1>
 				<div>{this.state.data && this.formatData()}</div>
+
+				{this.state.error && <p>{this.state.error}</p>}
+				{this.props.role !== 'CCI' && (
+					<div>
+						<Link
+							to={`/guardian/${this.props.match.params.id}/edit`}>
+							Edit Guardian
+						</Link>
+						{/* <div>
+							<label htmlFor='fileType'>
+								<select
+									value={this.state.fileType}
+									onChange={this.onFileUploadSelectHandler}
+									name='fileType'
+									id='fileType'>
+									<option value='SIR'>SIR</option>
+									<option value='medrep'>
+										Medical Report
+									</option>
+									<option value='photo'>Photo</option>
+									<option value='icp'>ICP</option>
+									<option value='parentletter'>
+										Parent Letter
+									</option>
+								</select>
+							</label>
+
+							<input
+								type='file'
+								id=''
+								onChange={this.handleFileUpload}
+							/>
+						</div> */}
+					</div>
+				)}
 			</div>
 		);
 	}
