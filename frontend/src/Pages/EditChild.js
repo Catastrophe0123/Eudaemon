@@ -100,6 +100,7 @@ export class EditChild extends Component {
 			}
 		}
 	};
+
 	render() {
 		dayjs.extend(relativeTime);
 		return (
