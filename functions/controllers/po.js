@@ -3,7 +3,7 @@ const firebase = require('../firebaseConfig');
 
 const { validationResult } = require('express-validator');
 
-exports.getPO = async () => {
+exports.getPO = async (req, res) => {
 	// get a particular PO
 
 	let id = req.params.id;
@@ -108,7 +108,9 @@ exports.getPOs = async (req, res) => {
 		let POs = [];
 		for (const PO of poData) {
 			console.log(PO.data());
-			POs.push(PO.data());
+			let data = PO.data();
+			data['id'] = PO.id;
+			POs.push(data);
 		}
 		return res.status(200).json({ po: POs });
 	} catch (err) {

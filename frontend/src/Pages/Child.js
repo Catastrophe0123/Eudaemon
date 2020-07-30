@@ -1,30 +1,30 @@
 import React, { Component } from 'react';
-// import axios from 'axios';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-export class PO extends Component {
+export class Child extends Component {
 	state = { data: null };
-
-	isDate = function (date) {
-		date = toString(date);
-		return date.match(
-			/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
-		);
-		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
-	};
 
 	componentDidMount = async () => {
 		//do the async
 		try {
 			let id = this.props.match.params.id;
-			let resp = await axios.get(`/po/${id}`);
+			let resp = await axios.get(`/child/${id}`);
 			console.log(resp);
 			this.setState({ data: resp.data });
 		} catch (err) {
 			console.error(err);
 		}
+	};
+
+	isDate = function (date) {
+		date = toString(date);
+
+		return date.match(
+			/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
+		);
+		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
 	};
 
 	formatData = () => {
@@ -42,9 +42,6 @@ export class PO extends Component {
 		}
 		for (const key in this.state.data) {
 			let value = this.state.data[key];
-			if (key === 'photo') {
-				continue;
-			}
 			if (this.isDate(value)) {
 				// it is a date
 				// format it
@@ -66,8 +63,15 @@ export class PO extends Component {
 	};
 
 	render() {
-		return <div>{this.state.data && this.formatData()}</div>;
+		dayjs.extend(relativeTime);
+		return (
+			<div>
+				<div>{this.state.data && this.formatData()}</div>
+
+				{this.state.error && <p>{this.state.error}</p>}
+			</div>
+		);
 	}
 }
 
-export default PO;
+export default Child;
