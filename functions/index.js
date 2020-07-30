@@ -174,7 +174,7 @@ app.post(
 			.exists()
 			.notEmpty()
 			.withMessage('Must contain CCI Name'),
-		body('cwc').exists().notEmpty().withMessage('Must contain CWC field'),
+		body('dcpu').exists().notEmpty().withMessage('Must contain DCPU field'),
 		body('classification')
 			.exists()
 			.notEmpty()

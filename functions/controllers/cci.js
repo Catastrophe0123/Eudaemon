@@ -52,36 +52,39 @@ exports.createCCI = async (req, res) => {
 
 			// have to check cwc and dcpu values are correct or not
 
-			let cwcQuery = await db
-				.collection('cwc')
-				.where('district', '==', req.body.district)
-				.get();
+			// let cwcQuery = await db
+			// 	.collection('cwc')
+			// 	.where('district', '==', req.body.district)
+			// 	.get();
 
 			let dcpuQuery = await db
 				.collection('dcpu')
 				.where('district', '==', req.body.district)
 				.get();
 			let dcpuDocs = dcpuQuery.docs;
-			let cwcDocs = cwcQuery.docs;
+			// let cwcDocs = cwcQuery.docs;
 			// console.log('dcpu : ', dcpuDocs[0].id);
 			let dcpulist = [];
-			let cwclist = [];
-			cwcDocs.forEach((el) => cwclist.push(el.id));
+			// let cwclist = [];
+			// cwcDocs.forEach((el) => cwclist.push(el.id));
 			dcpuDocs.forEach((el) => dcpulist.push(el.id));
-
-			if (!cwclist.includes(cwc) || !dcpulist.includes(dcpu)) {
+			console.log(dcpulist);
+			if (
+				// !cwclist.includes(cwc) ||
+				!dcpulist.includes(dcpu)
+			) {
 				return res
 					.status(400)
 					.json({ error: 'wrong/invalid cwc/dcpu' });
 			} else {
 				// get the cci array and then update
 
-				let cwcdoc = await db
-					.collection('cwc')
-					.doc(cwc)
-					.update({
-						ccis: admin.firestore.FieldValue.arrayUnion(cciName),
-					});
+				// let cwcdoc = await db
+				// 	.collection('cwc')
+				// 	.doc(cwc)
+				// 	.update({
+				// 		ccis: admin.firestore.FieldValue.arrayUnion(cciName),
+				// 	});
 
 				let dcpudoc = await db
 					.collection('dcpu')
@@ -96,7 +99,7 @@ exports.createCCI = async (req, res) => {
 					.doc(inCharge)
 					.update({
 						workingAt: cciName,
-						addedBy: req.user.user_id,
+						// addedBy: req.user.user_id,
 						addedByUser: req.user.email,
 					});
 			}
@@ -104,6 +107,7 @@ exports.createCCI = async (req, res) => {
 			let ref = await db.doc(`cci/${cciName}`).set(dataToAdd);
 			return res.status(201).json({
 				message: `cci with name : ${cciName} created successfully`,
+				id: cciName,
 			});
 		}
 	} catch (err) {
