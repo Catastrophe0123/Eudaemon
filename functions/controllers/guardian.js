@@ -66,3 +66,20 @@ exports.updateGuardian = async (req, res) => {
 		return res.status(400).json({ error: 'invalid child ID' });
 	}
 };
+
+exports.getGuardian = async (req, res) => {
+	try {
+		console.log('im running');
+		let id = req.params.id;
+		let doc = await db.doc(`guardians/${id}`).get();
+		// if(!doc.exists){
+		// 	return res.status(400).json({})
+		// }
+		let data = doc.data();
+		console.log(data);
+		return res.status(200).json(data);
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
+	}
+};

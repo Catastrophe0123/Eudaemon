@@ -42,7 +42,7 @@ const {
 const {
 	createGuardian,
 	updateGuardian,
-	// getGuardian,
+	getGuardian,
 } = require('./controllers/guardian');
 const {
 	getDCPU,
@@ -271,6 +271,8 @@ app.post(
 
 // GUARDIAN ROUTES
 // childId
+app.get('/guardian/:id', [isAuth], getGuardian);
+
 app.post(
 	'/guardian/:id',
 	[
