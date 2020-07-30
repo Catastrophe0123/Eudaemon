@@ -14,6 +14,7 @@ import Home from './Pages/Home';
 import Child from './Pages/Child';
 import Employee from './Pages/Employee';
 import EditChild from './Pages/EditChild';
+import CreateChild from './Pages/CreateChild';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
@@ -130,17 +131,24 @@ export class App extends Component {
 							component={CCI}
 						/>
 						<AuthRoute
-							path='/child/:id'
-							exact
-							authenticated={this.state.authenticated}
-							component={Child}
-						/>
-						<AuthRoute
 							path='/child/:id/edit'
 							exact
 							authenticated={this.state.authenticated}
 							component={EditChild}
 						/>
+						<AuthRoute
+							path='/child/create'
+							exact
+							authenticated={this.state.authenticated}
+							component={CreateChild}
+						/>
+						<AuthRoute
+							path='/child/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={Child}
+						/>
+
 						<AuthRoute
 							path='/DCPU/:id'
 							exact
