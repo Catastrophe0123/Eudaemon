@@ -12,6 +12,7 @@ import CWC from './Pages/CWC';
 import PO from './Pages/PO';
 import Home from './Pages/Home';
 import Child from './Pages/Child';
+import Employee from './Pages/Employee';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
@@ -109,6 +110,13 @@ export class App extends Component {
 							)}
 						/>
 						<AuthRoute
+							path='/employee/:id'
+							exact
+							axios={axios}
+							authenticated={this.state.authenticated}
+							component={Employee}
+						/>
+						<AuthRoute
 							path='/PO/:id'
 							exact
 							authenticated={this.state.authenticated}
@@ -127,16 +135,16 @@ export class App extends Component {
 							component={Child}
 						/>
 						<AuthRoute
+							path='/DCPU/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={DCPU}
+						/>
+						<AuthRoute
 							path='/CWC'
 							exact
 							authenticated={this.state.authenticated}
 							component={CWC}
-						/>
-						<AuthRoute
-							path='/DCPU'
-							exact
-							authenticated={this.state.authenticated}
-							component={DCPU}
 						/>
 					</Switch>
 				</Router>
