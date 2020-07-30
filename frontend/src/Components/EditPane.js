@@ -86,6 +86,16 @@ export class EditPane extends Component {
 					)}>
 					Submit
 				</button>
+				{this.props.onCreateGuardianHandler && (
+					<button
+						onClick={this.props.onCreateGuardianHandler.bind(
+							this,
+							this.state.keys,
+							this.state.values
+						)}>
+						Submit and Create Guardian Profile
+					</button>
+				)}
 			</div>
 		);
 	}

@@ -25,7 +25,7 @@ export class CreateChild extends Component {
 		}
 	};
 
-	onCreateGuardianHandler = async () => {
+	onCreateGuardianHandler = async (keys, values) => {
 		// submit and move to the create guardian page
 		let obj = {};
 
@@ -56,12 +56,10 @@ export class CreateChild extends Component {
 				<h1>Create a child</h1>
 				<div>
 					<EditPane
+						onCreateGuardianHandler={this.onCreateGuardianHandler}
 						onSubmitHandler={this.onSubmitHandler}
 						data={{}}
 					/>
-					<button onClick={this.onCreateGuardianHandler}>
-						Create a Guardian Profile
-					</button>
 				</div>
 			</div>
 		);
