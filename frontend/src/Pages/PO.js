@@ -1,9 +1,19 @@
 import React, { Component } from 'react';
 // import axios from 'axios';
 import axios from '../util/axiosinstance';
+import dayjs from 'dayjs';
+import relativeTime from 'dayjs/plugin/relativeTime';
 
 export class PO extends Component {
 	state = { data: null };
+
+	isDate = function (date) {
+		date = toString(date);
+		return date.match(
+			/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
+		);
+		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
+	};
 
 	componentDidMount = async () => {
 		//do the async
@@ -32,6 +42,9 @@ export class PO extends Component {
 		}
 		for (const key in this.state.data) {
 			let value = this.state.data[key];
+			if (key === 'photo') {
+				continue;
+			}
 			if (this.isDate(value)) {
 				// it is a date
 				// format it
