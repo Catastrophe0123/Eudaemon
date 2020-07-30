@@ -20,7 +20,10 @@ export class CCI extends Component {
 	};
 
 	isDate = function (date) {
-		return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
+		return date.match(
+			/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
+		);
+		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
 	};
 
 	showChildrenHandler = async () => {
@@ -55,7 +58,7 @@ export class CCI extends Component {
 			return (
 				<div>
 					<Link to={`/child/${el.id}`}>
-						<img src={pic} alt='default picture' srcset='' />
+						<img src={pic} alt='' />
 						name: {el.name}
 					</Link>
 				</div>
