@@ -15,6 +15,8 @@ import Child from './Pages/Child';
 import Employee from './Pages/Employee';
 import EditChild from './Pages/EditChild';
 import CreateChild from './Pages/CreateChild';
+import CreateGuardian from './Pages/CreateGuardian';
+import Guardian from './Pages/Guardian';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
@@ -141,6 +143,20 @@ export class App extends Component {
 							exact
 							authenticated={this.state.authenticated}
 							component={CreateChild}
+						/>
+						<AuthRoute
+							path='/child/:id/guardian/create'
+							exact
+							axios={axios}
+							authenticated={this.state.authenticated}
+							component={CreateGuardian}
+						/>
+						<AuthRoute
+							path='/child/:id/guardian'
+							exact
+							axios={axios}
+							authenticated={this.state.authenticated}
+							component={Guardian}
 						/>
 						<AuthRoute
 							path='/child/:id'
