@@ -93,12 +93,7 @@ export class App extends Component {
 							authenticated={this.state.authenticated}
 							component={Home}
 						/>
-						<AuthRoute
-							path='/PO/:id'
-							exact
-							authenticated={this.state.authenticated}
-							component={PO}
-						/>
+
 						<Route
 							exact
 							path='/login'
@@ -113,6 +108,18 @@ export class App extends Component {
 							)}
 						/>
 						<AuthRoute
+							path='/PO/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={PO}
+						/>
+						<AuthRoute
+							path='/CCI/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={CCI}
+						/>
+						<AuthRoute
 							path='/CWC'
 							exact
 							authenticated={this.state.authenticated}
@@ -123,12 +130,6 @@ export class App extends Component {
 							exact
 							authenticated={this.state.authenticated}
 							component={DCPU}
-						/>
-						<AuthRoute
-							path='/CCI'
-							exact
-							authenticated={this.state.authenticated}
-							component={CCI}
 						/>
 					</Switch>
 				</Router>
