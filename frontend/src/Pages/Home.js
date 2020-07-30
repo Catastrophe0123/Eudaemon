@@ -27,19 +27,40 @@ export class Home extends Component {
 		}
 	};
 
+	onClickDCPUData = async () => {
+		try {
+			let resp = await Axios.get(`/dcpu?district=${this.props.district}`);
+			console.log(resp);
+			this.setState({ DCPUData: resp.data, showDCPU: true });
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
+	formatDCPUData = () => {};
+
 	fullAccessMarkUp = (role) => {
 		return (
 			<div>
 				<div>
-					<h3>CCIs under your jurisdiction</h3>
-					{this.state.data.ccis.map((el) => {
-						return (
-							<div>
-								<Link to={`/cci/${el}`}>{el}</Link>
-							</div>
-						);
-					})}
-					<button onClick={this.onClickPOData}>
+					<button
+						disabled={this.state.showCCIs}
+						onClick={() => this.setState({ showCCIs: true })}>
+						CCIs under your jurisdiction
+					</button>
+
+					{this.state.showCCIs &&
+						this.state.data.ccis.map((el) => {
+							return (
+								<div>
+									<Link to={`/cci/${el}`}>{el}</Link>
+								</div>
+							);
+						})}
+
+					<button
+						disabled={this.state.showPO}
+						onClick={this.onClickPOData}>
 						POs under your jurisdiction
 					</button>
 					{this.state.showPO && (
@@ -47,6 +68,25 @@ export class Home extends Component {
 							{this.state.POData.po.map((el) => {
 								return (
 									<Link to={`/po/${el.id}`}>{el.name}</Link>
+								);
+							})}
+						</div>
+					)}
+					<button
+						disabled={this.state.showDCPU}
+						onClick={this.onClickDCPUData}>
+						DCPUs under your jurisdiction
+					</button>
+					{this.state.showDCPU && (
+						<div>
+							{/* {this.formatDCPUData()} */}
+							{this.state.DCPUData.map((el) => {
+								return (
+									<div>
+										<Link to={`/dcpu/${el.id}`}>
+											{el.id}
+										</Link>
+									</div>
 								);
 							})}
 						</div>

@@ -58,7 +58,6 @@ exports.getDCPUs = async (req, res) => {
 
 	try {
 		let final = [];
-
 		let docs = await db
 			.collection('dcpu')
 			.where('district', '==', district)
@@ -68,12 +67,15 @@ exports.getDCPUs = async (req, res) => {
 		}
 
 		let allData = docs.docs;
-
 		// populate CCIs
 
 		for (let result of allData) {
 			if (result.exists) {
-				let data = result.data();
+				let d = result.data();
+				d['id'] = result.id;
+				final.push(d);
+				continue;
+				// return res.status(200).json({ data });
 				let ccis = {};
 				console.log('ccis: before:  ', ccis);
 

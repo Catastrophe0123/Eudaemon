@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import { Link } from 'react-router-dom';
 
 export class Child extends Component {
 	state = { data: null };
@@ -19,11 +20,17 @@ export class Child extends Component {
 	};
 
 	isDate = function (date) {
-		date = toString(date);
+		date = date.toString();
 
-		return date.match(
-			/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
-		);
+		if (
+			date.match(
+				/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
+			)
+		) {
+			return true;
+		} else {
+			return false;
+		}
 		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
 	};
 
@@ -50,6 +57,8 @@ export class Child extends Component {
 						{key} : {dayjs(value).fromNow()}
 					</p>
 				);
+			} else if (key === 'photo') {
+				continue;
 			} else {
 				x.push(
 					<p>
@@ -69,6 +78,11 @@ export class Child extends Component {
 				<div>{this.state.data && this.formatData()}</div>
 
 				{this.state.error && <p>{this.state.error}</p>}
+				{this.props.role !== 'CCI' && (
+					<Link to={`/child/${this.props.match.params.id}/edit`}>
+						Edit Child
+					</Link>
+				)}
 			</div>
 		);
 	}

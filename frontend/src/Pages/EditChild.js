@@ -1,11 +1,26 @@
 import React, { Component } from 'react';
-// import axios from 'axios';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
+import EditPane from '../Components/EditPane';
 
-export class PO extends Component {
+export class EditChild extends Component {
 	state = { data: null };
+
+	componentDidMount = async () => {
+		//do the async
+		try {
+			let id = this.props.match.params.id;
+			let resp = await axios.get(`/child/${id}`);
+			console.log(resp);
+			delete resp.data['SIR'];
+			delete resp.data['photo'];
+			this.setState({ data: resp.data });
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	isDate = function (date) {
 		date = date.toString();
 
@@ -19,18 +34,6 @@ export class PO extends Component {
 			return false;
 		}
 		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
-	};
-
-	componentDidMount = async () => {
-		//do the async
-		try {
-			let id = this.props.match.params.id;
-			let resp = await axios.get(`/po/${id}`);
-			console.log(resp);
-			this.setState({ data: resp.data });
-		} catch (err) {
-			console.error(err);
-		}
 	};
 
 	formatData = () => {
@@ -48,9 +51,6 @@ export class PO extends Component {
 		}
 		for (const key in this.state.data) {
 			let value = this.state.data[key];
-			if (key === 'photo') {
-				continue;
-			}
 			if (this.isDate(value)) {
 				// it is a date
 				// format it
@@ -71,10 +71,53 @@ export class PO extends Component {
 		return <div>{x}</div>;
 	};
 
+	onSubmitHandler = async (keys, values) => {
+		// keys and values we have
+		// combine them into a json
+
+		try {
+			let obj = {};
+
+			for (let id = 0; id < keys.length; id++) {
+				const el = keys[id];
+				if (el.trim() === '' || values[id].trim() === '') {
+					continue;
+				}
+				obj[el] = values[id];
+			}
+			// keys.forEach((el, id) => {
+
+			// });
+			console.log(obj);
+			let resp = await axios.put(`/child/${this.props.match.params.id}`, {
+				...obj,
+			});
+			this.props.history.push(`/child/${this.props.match.params.id}`);
+		} catch (err) {
+			console.error(err);
+			if (err.response.error) {
+				this.setState({ error: err.response.err });
+			}
+		}
+	};
 	render() {
 		dayjs.extend(relativeTime);
-		return <div>{this.state.data && this.formatData()}</div>;
+		return (
+			<div>
+				<div>
+					{this.state.data && (
+						<EditPane
+							onSubmitHandler={this.onSubmitHandler}
+							data={this.state.data}
+						/>
+					)}
+				</div>
+				{/* <div>{this.state.data && this.formatData()}</div> */}
+
+				{this.state.error && <p>{this.state.error}</p>}
+			</div>
+		);
 	}
 }
 
-export default PO;
+export default EditChild;

@@ -1,14 +1,26 @@
 import React, { Component } from 'react';
-// import axios from 'axios';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 
-export class PO extends Component {
+export class Employee extends Component {
 	state = { data: null };
+	componentDidMount = async () => {
+		// do the req
+		try {
+			let id = this.props.match.params.id;
+			// let { axios } = this.props.axios;
+			let resp = await axios.get(`/employees/${id}`);
+			this.setState({ data: resp.data });
+			console.log(resp);
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	isDate = function (date) {
 		date = date.toString();
-
+		console.log(date);
 		if (
 			date.match(
 				/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
@@ -21,15 +33,19 @@ export class PO extends Component {
 		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
 	};
 
-	componentDidMount = async () => {
-		//do the async
-		try {
-			let id = this.props.match.params.id;
-			let resp = await axios.get(`/po/${id}`);
-			console.log(resp);
-			this.setState({ data: resp.data });
-		} catch (err) {
-			console.error(err);
+	isLink = (link) => {
+		var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+		var regex = new RegExp(expression);
+
+		link = link.toString();
+		if (
+			link.match(
+				/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+			)
+		) {
+			return true;
+		} else {
+			return false;
 		}
 	};
 
@@ -59,6 +75,8 @@ export class PO extends Component {
 						{key} : {dayjs(value).fromNow()}
 					</p>
 				);
+			} else if (this.isLink(value)) {
+				x.push(<a href={value}>{key}</a>);
 			} else {
 				x.push(
 					<p>
@@ -73,8 +91,9 @@ export class PO extends Component {
 
 	render() {
 		dayjs.extend(relativeTime);
+
 		return <div>{this.state.data && this.formatData()}</div>;
 	}
 }
 
-export default PO;
+export default Employee;
