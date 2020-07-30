@@ -24,6 +24,7 @@ exports.createChild = async (req, res) => {
 		// created successfully
 		return res.status(201).json({
 			message: `child with id : ${doc.id} created successfully`,
+			id: doc.id,
 		});
 	} catch (err) {
 		console.error(err);
