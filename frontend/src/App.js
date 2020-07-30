@@ -11,6 +11,7 @@ import DCPU from './Pages/DCPU';
 import CWC from './Pages/CWC';
 import PO from './Pages/PO';
 import Home from './Pages/Home';
+import Child from './Pages/Child';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
@@ -118,6 +119,12 @@ export class App extends Component {
 							exact
 							authenticated={this.state.authenticated}
 							component={CCI}
+						/>
+						<AuthRoute
+							path='/child/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={Child}
 						/>
 						<AuthRoute
 							path='/CWC'
