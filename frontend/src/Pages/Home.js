@@ -91,6 +91,7 @@ export class Home extends Component {
 							})}
 						</div>
 					)}
+					<Link to={'/child/create'}>Create a Child Profile</Link>
 				</div>
 			</div>
 		);
