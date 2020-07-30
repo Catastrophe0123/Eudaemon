@@ -272,12 +272,8 @@ app.post(
 // GUARDIAN ROUTES
 // childId
 app.post(
-	'/guardian',
+	'/guardian/:id',
 	[
-		body('childId')
-			.exists()
-			.notEmpty()
-			.withMessage('Must have a childId property'),
 		body('name')
 			.exists()
 			.notEmpty()
