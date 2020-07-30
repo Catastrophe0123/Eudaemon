@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Link } from 'react-router-dom';
+import EditPane from '../Components/EditPane';
 
-export class Child extends Component {
+export class EditChild extends Component {
 	state = { data: null };
 
 	componentDidMount = async () => {
@@ -13,6 +13,8 @@ export class Child extends Component {
 			let id = this.props.match.params.id;
 			let resp = await axios.get(`/child/${id}`);
 			console.log(resp);
+			delete resp.data['SIR'];
+			delete resp.data['photo'];
 			this.setState({ data: resp.data });
 		} catch (err) {
 			console.error(err);
@@ -57,8 +59,6 @@ export class Child extends Component {
 						{key} : {dayjs(value).fromNow()}
 					</p>
 				);
-			} else if (key === 'photo') {
-				continue;
 			} else {
 				x.push(
 					<p>
@@ -71,21 +71,53 @@ export class Child extends Component {
 		return <div>{x}</div>;
 	};
 
+	onSubmitHandler = async (keys, values) => {
+		// keys and values we have
+		// combine them into a json
+
+		try {
+			let obj = {};
+
+			for (let id = 0; id < keys.length; id++) {
+				const el = keys[id];
+				if (el.trim() === '' || values[id].trim() === '') {
+					continue;
+				}
+				obj[el] = values[id];
+			}
+			// keys.forEach((el, id) => {
+
+			// });
+			console.log(obj);
+			let resp = await axios.put(`/child/${this.props.match.params.id}`, {
+				...obj,
+			});
+			this.props.history.push(`/child/${this.props.match.params.id}`);
+		} catch (err) {
+			console.error(err);
+			if (err.response.error) {
+				this.setState({ error: err.response.err });
+			}
+		}
+	};
 	render() {
 		dayjs.extend(relativeTime);
 		return (
 			<div>
-				<div>{this.state.data && this.formatData()}</div>
+				<div>
+					{this.state.data && (
+						<EditPane
+							onSubmitHandler={this.onSubmitHandler}
+							data={this.state.data}
+						/>
+					)}
+				</div>
+				{/* <div>{this.state.data && this.formatData()}</div> */}
 
 				{this.state.error && <p>{this.state.error}</p>}
-				{this.props.role !== 'CCI' && (
-					<Link to={`/child/${this.props.match.params.id}/edit`}>
-						Edit Child
-					</Link>
-				)}
 			</div>
 		);
 	}
 }
 
-export default Child;
+export default EditChild;

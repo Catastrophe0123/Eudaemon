@@ -13,6 +13,7 @@ import PO from './Pages/PO';
 import Home from './Pages/Home';
 import Child from './Pages/Child';
 import Employee from './Pages/Employee';
+import EditChild from './Pages/EditChild';
 
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
@@ -133,6 +134,12 @@ export class App extends Component {
 							exact
 							authenticated={this.state.authenticated}
 							component={Child}
+						/>
+						<AuthRoute
+							path='/child/:id/edit'
+							exact
+							authenticated={this.state.authenticated}
+							component={EditChild}
 						/>
 						<AuthRoute
 							path='/DCPU/:id'
