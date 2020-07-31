@@ -30,6 +30,7 @@ import EditEmployee from './Pages/EditEmployee';
 
 import CreateCCI from './Pages/CreateCCI';
 import CCI from './Pages/CCI';
+import EditCCI from './Pages/EditCCI';
 
 import CreateGuardian from './Pages/CreateGuardian';
 import Guardian from './Pages/Guardian';
@@ -168,10 +169,21 @@ export class App extends Component {
 						<AuthRoute
 							path='/CCI/:id'
 							exact
+							role={this.state.role}
+							district={this.state.district}
 							authenticated={this.state.authenticated}
 							component={CCI}
 						/>{' '}
 						{/* CCI read */}
+						<AuthRoute
+							path='/CCI/:id/edit'
+							exact
+							role={this.state.role}
+							district={this.state.district}
+							authenticated={this.state.authenticated}
+							component={EditCCI}
+						/>{' '}
+						{/* CCI edit */}
 						<AuthRoute
 							path='/child/:id/edit'
 							exact

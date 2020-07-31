@@ -117,6 +117,12 @@ export class CCI extends Component {
 				</button>
 				{this.state.error && <p>{this.state.error}</p>}
 				{this.state.childData && this.showChildData()}
+
+				{this.props.role === 'DCPU' && (
+					<Link to={`/cci/${this.props.match.params.id}/edit`}>
+						EDIT CCI
+					</Link>
+				)}
 			</div>
 		);
 	}
