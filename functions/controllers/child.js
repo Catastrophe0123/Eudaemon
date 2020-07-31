@@ -24,6 +24,7 @@ exports.createChild = async (req, res) => {
 		// created successfully
 		return res.status(201).json({
 			message: `child with id : ${doc.id} created successfully`,
+			id: doc.id,
 		});
 	} catch (err) {
 		console.error(err);
@@ -77,6 +78,7 @@ exports.getChild = async (req, res) => {
 				// doc exists
 				let docData = doc.data();
 				req.childData = docData;
+				return res.status(200).json(req.childData);
 			}
 		}
 	} catch (err) {
@@ -84,26 +86,26 @@ exports.getChild = async (req, res) => {
 		return res.status(400).json({ error: err.message });
 	}
 
-	try {
-		if (req.childData.guardian) {
-			// populate guardian
-			let guardianDoc = await db
-				.collection('guardians')
-				.doc(req.childData.guardian)
-				.get();
-			if (!guardianDoc.exists)
-				return res.status(200).json({
-					error: 'guardian data does not exist',
-					childData: req.childData,
-				});
-			let guardianData = guardianDoc.data();
-			req.childData['guardian'] = guardianData;
-			return res.status(200).json(req.childData);
-		} else {
-			return res.status(200).json(req.childData);
-		}
-	} catch (err) {
-		console.error(err);
-		return res.status(400).json({ error: err.message });
-	}
+	// try {
+	// 	if (req.childData.guardian) {
+	// 		// populate guardian
+	// 		let guardianDoc = await db
+	// 			.collection('guardians')
+	// 			.doc(req.childData.guardian)
+	// 			.get();
+	// 		if (!guardianDoc.exists)
+	// 			return res.status(200).json({
+	// 				error: 'guardian data does not exist',
+	// 				childData: req.childData,
+	// 			});
+	// 		let guardianData = guardianDoc.data();
+	// 		req.childData['guardian'] = guardianData;
+	// 		return res.status(200).json(req.childData);
+	// 	} else {
+	// 		return res.status(200).json(req.childData);
+	// 	}
+	// } catch (err) {
+	// 	console.error(err);
+	// 	return res.status(400).json({ error: err.message });
+	// }
 };

@@ -2,19 +2,16 @@ import React, { Component } from 'react';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import EditPane from '../Components/EditPane';
+import { Link } from 'react-router-dom';
 
-export class EditChild extends Component {
+export class Guardian extends Component {
 	state = { data: null };
 
 	componentDidMount = async () => {
-		//do the async
 		try {
 			let id = this.props.match.params.id;
-			let resp = await axios.get(`/child/${id}`);
+			let resp = await axios.get(`/guardian/${id}`);
 			console.log(resp);
-			delete resp.data['SIR'];
-			delete resp.data['photo'];
 			this.setState({ data: resp.data });
 		} catch (err) {
 			console.error(err);
@@ -59,6 +56,8 @@ export class EditChild extends Component {
 						{key} : {dayjs(value).fromNow()}
 					</p>
 				);
+			} else if (key === 'photo') {
+				continue;
 			} else {
 				x.push(
 					<p>
@@ -71,54 +70,51 @@ export class EditChild extends Component {
 		return <div>{x}</div>;
 	};
 
-	onSubmitHandler = async (keys, values) => {
-		// keys and values we have
-		// combine them into a json
-
-		try {
-			let obj = {};
-
-			for (let id = 0; id < keys.length; id++) {
-				const el = keys[id];
-				if (el.trim() === '' || values[id].trim() === '') {
-					continue;
-				}
-				obj[el] = values[id];
-			}
-			// keys.forEach((el, id) => {
-
-			// });
-			console.log(obj);
-			let resp = await axios.put(`/child/${this.props.match.params.id}`, {
-				...obj,
-			});
-			this.props.history.push(`/child/${this.props.match.params.id}`);
-		} catch (err) {
-			console.error(err);
-			if (err.response.error) {
-				this.setState({ error: err.response.err });
-			}
-		}
-	};
-
 	render() {
 		dayjs.extend(relativeTime);
+
 		return (
 			<div>
-				<div>
-					{this.state.data && (
-						<EditPane
-							onSubmitHandler={this.onSubmitHandler}
-							data={this.state.data}
-						/>
-					)}
-				</div>
-				{/* <div>{this.state.data && this.formatData()}</div> */}
+				<h1>show guardian data route</h1>
+				<div>{this.state.data && this.formatData()}</div>
 
 				{this.state.error && <p>{this.state.error}</p>}
+				{this.props.role !== 'CCI' && (
+					<div>
+						<Link
+							to={`/guardian/${this.props.match.params.id}/edit`}>
+							Edit Guardian
+						</Link>
+						{/* <div>
+							<label htmlFor='fileType'>
+								<select
+									value={this.state.fileType}
+									onChange={this.onFileUploadSelectHandler}
+									name='fileType'
+									id='fileType'>
+									<option value='SIR'>SIR</option>
+									<option value='medrep'>
+										Medical Report
+									</option>
+									<option value='photo'>Photo</option>
+									<option value='icp'>ICP</option>
+									<option value='parentletter'>
+										Parent Letter
+									</option>
+								</select>
+							</label>
+
+							<input
+								type='file'
+								id=''
+								onChange={this.handleFileUpload}
+							/>
+						</div> */}
+					</div>
+				)}
 			</div>
 		);
 	}
 }
 
-export default EditChild;
+export default Guardian;

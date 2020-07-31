@@ -91,6 +91,12 @@ export class Home extends Component {
 							})}
 						</div>
 					)}
+					<Link to={'/child/create'}>Create a Child Profile</Link>
+					{this.props.role === 'DCPU' && (
+						<div>
+							<Link to='/employee/create'>Create a CCI</Link>
+						</div>
+					)}
 				</div>
 			</div>
 		);

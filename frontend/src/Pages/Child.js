@@ -5,10 +5,9 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Link } from 'react-router-dom';
 
 export class Child extends Component {
-	state = { data: null };
+	state = { data: null, fileType: 'SIR' };
 
-	componentDidMount = async () => {
-		//do the async
+	fetchData = async () => {
 		try {
 			let id = this.props.match.params.id;
 			let resp = await axios.get(`/child/${id}`);
@@ -17,6 +16,11 @@ export class Child extends Component {
 		} catch (err) {
 			console.error(err);
 		}
+	};
+
+	componentDidMount = async () => {
+		//do the async
+		this.fetchData();
 	};
 
 	isDate = function (date) {
@@ -59,6 +63,12 @@ export class Child extends Component {
 				);
 			} else if (key === 'photo') {
 				continue;
+			} else if (key === 'guardianName') {
+				x.push(
+					<Link to={`/guardian/${this.state.data['guardian']}`}>
+						{key}: {value}
+					</Link>
+				);
 			} else {
 				x.push(
 					<p>
@@ -71,6 +81,28 @@ export class Child extends Component {
 		return <div>{x}</div>;
 	};
 
+	onFileUploadSelectHandler = (event) => {
+		let fileType = event.target.value;
+		this.setState({ fileType });
+	};
+
+	handleFileUpload = async (event) => {
+		try {
+			const filename = event.target.files[0];
+
+			const formData = new FormData();
+			formData.append('file', filename, filename.name);
+			let resp = await axios.post(
+				`/child/${this.props.match.params.id}/upload/${this.state.fileType}`,
+				formData
+			);
+			this.fetchData();
+			// this.props.history.push(`/child/${this.props.match.params.id}`);
+		} catch (err) {
+			console.log(err);
+		}
+	};
+
 	render() {
 		dayjs.extend(relativeTime);
 		return (
@@ -79,9 +111,36 @@ export class Child extends Component {
 
 				{this.state.error && <p>{this.state.error}</p>}
 				{this.props.role !== 'CCI' && (
-					<Link to={`/child/${this.props.match.params.id}/edit`}>
-						Edit Child
-					</Link>
+					<div>
+						<Link to={`/child/${this.props.match.params.id}/edit`}>
+							Edit Child
+						</Link>
+						<div>
+							<label htmlFor='fileType'>
+								<select
+									value={this.state.fileType}
+									onChange={this.onFileUploadSelectHandler}
+									name='fileType'
+									id='fileType'>
+									<option value='SIR'>SIR</option>
+									<option value='medrep'>
+										Medical Report
+									</option>
+									<option value='photo'>Photo</option>
+									<option value='icp'>ICP</option>
+									<option value='parentletter'>
+										Parent Letter
+									</option>
+								</select>
+							</label>
+
+							<input
+								type='file'
+								id=''
+								onChange={this.handleFileUpload}
+							/>
+						</div>
+					</div>
 				)}
 			</div>
 		);

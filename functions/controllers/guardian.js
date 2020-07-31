@@ -8,17 +8,17 @@ exports.createGuardian = async (req, res) => {
 		return res.status(400).send(errors.array());
 	}
 	// create a guardian
-
+	let childId = req.params.id;
+	console.log(childId);
+	let doc;
+	let guardianData = req.body;
 	try {
-		let childId = req.body.childId;
-
 		let org = req.user.organisation;
-		let guardianData = req.body;
 		guardianData['createdAt'] = new Date().toISOString();
 		guardianData['createdBy'] = req.user.user_id;
 		guardianData['createdByUser'] = req.user.email;
 
-		let doc = await db.collection('guardians').add(guardianData);
+		doc = await db.collection('guardians').add(guardianData);
 		// update in the child's data
 	} catch (err) {
 		console.error(err);
@@ -31,14 +31,14 @@ exports.createGuardian = async (req, res) => {
 	childData['lastEditedAt'] = new Date().toISOString();
 
 	try {
-		let x = await db
-			.collection('children')
-			.doc(childId)
-			.update({
-				guardian: doc.id,
-				guardianName: guardianData['name'],
-				...childData,
-			});
+		let x = await db.doc(`children/${childId}`).update({
+			guardian: doc.id,
+			guardianName: guardianData['name'],
+			...childData,
+		});
+		return res
+			.status(201)
+			.json({ message: 'guardian successfully created', id: childId });
 	} catch (err) {
 		console.error(err);
 		return res.status(400).json({ error: 'invalid child ID' });
@@ -64,5 +64,22 @@ exports.updateGuardian = async (req, res) => {
 	} catch (error) {
 		console.error(err);
 		return res.status(400).json({ error: 'invalid child ID' });
+	}
+};
+
+exports.getGuardian = async (req, res) => {
+	try {
+		console.log('im running');
+		let id = req.params.id;
+		let doc = await db.doc(`guardians/${id}`).get();
+		// if(!doc.exists){
+		// 	return res.status(400).json({})
+		// }
+		let data = doc.data();
+		console.log(data);
+		return res.status(200).json(data);
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
 	}
 };

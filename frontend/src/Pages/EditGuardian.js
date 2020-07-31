@@ -4,14 +4,14 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import EditPane from '../Components/EditPane';
 
-export class EditChild extends Component {
+export class EditGuardian extends Component {
 	state = { data: null };
 
 	componentDidMount = async () => {
 		//do the async
 		try {
 			let id = this.props.match.params.id;
-			let resp = await axios.get(`/child/${id}`);
+			let resp = await axios.get(`/guardian/${id}`);
 			console.log(resp);
 			delete resp.data['SIR'];
 			delete resp.data['photo'];
@@ -89,10 +89,13 @@ export class EditChild extends Component {
 
 			// });
 			console.log(obj);
-			let resp = await axios.put(`/child/${this.props.match.params.id}`, {
-				...obj,
-			});
-			this.props.history.push(`/child/${this.props.match.params.id}`);
+			let resp = await axios.put(
+				`/guardian/${this.props.match.params.id}`,
+				{
+					...obj,
+				}
+			);
+			this.props.history.push(`/guardian/${this.props.match.params.id}`);
 		} catch (err) {
 			console.error(err);
 			if (err.response.error) {
@@ -121,4 +124,4 @@ export class EditChild extends Component {
 	}
 }
 
-export default EditChild;
+export default EditGuardian;

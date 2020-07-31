@@ -42,7 +42,7 @@ const {
 const {
 	createGuardian,
 	updateGuardian,
-	// getGuardian,
+	getGuardian,
 } = require('./controllers/guardian');
 const {
 	getDCPU,
@@ -174,7 +174,7 @@ app.post(
 			.exists()
 			.notEmpty()
 			.withMessage('Must contain CCI Name'),
-		body('cwc').exists().notEmpty().withMessage('Must contain CWC field'),
+		body('dcpu').exists().notEmpty().withMessage('Must contain DCPU field'),
 		body('classification')
 			.exists()
 			.notEmpty()
@@ -271,13 +271,11 @@ app.post(
 
 // GUARDIAN ROUTES
 // childId
+app.get('/guardian/:id', [isAuth], getGuardian);
+
 app.post(
-	'/guardian',
+	'/guardian/:id',
 	[
-		body('childId')
-			.exists()
-			.notEmpty()
-			.withMessage('Must have a childId property'),
 		body('name')
 			.exists()
 			.notEmpty()
