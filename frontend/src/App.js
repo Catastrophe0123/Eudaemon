@@ -5,26 +5,35 @@ import {
 	Route,
 	Redirect,
 } from 'react-router-dom';
-import AuthRoute from './Components/AuthRoute';
-import CCI from './Pages/CCI';
-import DCPU from './Pages/DCPU';
-import CWC from './Pages/CWC';
-import PO from './Pages/PO';
-import Home from './Pages/Home';
-import Child from './Pages/Child';
-import Employee from './Pages/Employee';
-import EditChild from './Pages/EditChild';
-import CreateChild from './Pages/CreateChild';
-import CreateCCI from './Pages/CreateCCI';
-import CreateGuardian from './Pages/CreateGuardian';
-import CreateEmployee from './Pages/CreateEmployee';
-import Guardian from './Pages/Guardian';
-import EditGuardian from './Pages/EditGuardian';
-
 import Login from './Pages/Login';
 import JwtDecode from 'jwt-decode';
 // import axios from 'axios';
 import axios from './util/axiosinstance';
+
+import AuthRoute from './Components/AuthRoute';
+
+import DCPU from './Pages/DCPU';
+
+import CWC from './Pages/CWC';
+
+import PO from './Pages/PO';
+
+import Home from './Pages/Home';
+
+import EditChild from './Pages/EditChild';
+import CreateChild from './Pages/CreateChild';
+import Child from './Pages/Child';
+
+import CreateEmployee from './Pages/CreateEmployee';
+import Employee from './Pages/Employee';
+import EditEmployee from './Pages/EditEmployee';
+
+import CreateCCI from './Pages/CreateCCI';
+import CCI from './Pages/CCI';
+
+import CreateGuardian from './Pages/CreateGuardian';
+import Guardian from './Pages/Guardian';
+import EditGuardian from './Pages/EditGuardian';
 
 export class App extends Component {
 	state = { authenticated: false, role: '', organisation: '', district: '' };
@@ -102,7 +111,6 @@ export class App extends Component {
 							authenticated={this.state.authenticated}
 							component={Home}
 						/>
-
 						<Route
 							exact
 							path='/login'
@@ -114,92 +122,107 @@ export class App extends Component {
 										this.setUserDataPostLogin
 									}
 								/>
-							)}
+							)} // login
 						/>
+						<AuthRoute
+							path='/employee/:id'
+							exact
+							role={this.state.role}
+							axios={axios}
+							authenticated={this.state.authenticated}
+							component={Employee}
+						/>{' '}
+						{/* emp read */}
 						<AuthRoute
 							path='/employee/create'
 							exact
 							axios={axios}
 							authenticated={this.state.authenticated}
 							component={CreateEmployee}
-						/>
+						/>{' '}
+						{/* emp create */}
 						<AuthRoute
-							path='/employee/:id'
+							path='/employee/:id/edit'
 							exact
+							district={this.state.district}
 							axios={axios}
 							authenticated={this.state.authenticated}
-							component={Employee}
-						/>
+							component={EditEmployee}
+						/>{' '}
+						{/* emp update */}
 						<AuthRoute
 							path='/PO/:id'
 							exact
 							authenticated={this.state.authenticated}
 							component={PO}
-						/>
+						/>{' '}
+						{/* PO read */}
 						<AuthRoute
 							path='/CCI/create/:empname/:empid'
 							exact
 							authenticated={this.state.authenticated}
 							component={CreateCCI}
 							organisation={this.state.organisation}
-						/>
+						/>{' '}
+						{/* CCI create */}
 						<AuthRoute
 							path='/CCI/:id'
 							exact
 							authenticated={this.state.authenticated}
 							component={CCI}
-						/>
+						/>{' '}
+						{/* CCI read */}
 						<AuthRoute
 							path='/child/:id/edit'
 							exact
 							authenticated={this.state.authenticated}
 							component={EditChild}
-						/>
+						/>{' '}
+						{/* child update */}
 						<AuthRoute
 							path='/child/create'
 							exact
 							authenticated={this.state.authenticated}
 							component={CreateChild}
-						/>
+						/>{' '}
+						{/* child create */}
 						<AuthRoute
 							path='/child/:id/guardian/create'
 							exact
 							axios={axios}
 							authenticated={this.state.authenticated}
 							component={CreateGuardian}
-						/>
+						/>{' '}
+						{/* Guardian create */}
 						<AuthRoute
 							path='/guardian/:id'
 							exact
 							axios={axios}
 							authenticated={this.state.authenticated}
 							component={Guardian}
-						/>
+						/>{' '}
+						{/* guardian read */}
 						<AuthRoute
 							path='/guardian/:id/edit'
 							exact
 							authenticated={this.state.authenticated}
 							component={EditGuardian}
-						/>
-						<AuthRoute
-							path='/child/:id'
-							exact
-							authenticated={this.state.authenticated}
-							component={Child}
-						/>
-
+						/>{' '}
+						{/* guardian edit */}
 						<AuthRoute
 							path='/DCPU/:id'
 							exact
 							authenticated={this.state.authenticated}
 							component={DCPU}
-						/>
+						/>{' '}
+						{/* dcpu read */}
 						<AuthRoute
 							path='/CWC'
 							exact
 							authenticated={this.state.authenticated}
 							component={CWC}
-						/>
+						/>{' '}
+						{/* cwc read */}
 					</Switch>
 				</Router>
 			</div>

@@ -2,18 +2,20 @@ import React, { Component } from 'react';
 import axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { Link } from 'react-router-dom';
+import EditPane from '../Components/EditPane';
 
-export class Employee extends Component {
+export class EditEmployee extends Component {
 	state = { data: null };
+
 	componentDidMount = async () => {
-		// do the req
+		//do the async
 		try {
 			let id = this.props.match.params.id;
-			// let { axios } = this.props.axios;
 			let resp = await axios.get(`/employees/${id}`);
-			this.setState({ data: resp.data });
 			console.log(resp);
+			delete resp.data['SIR'];
+			delete resp.data['photo'];
+			this.setState({ data: resp.data });
 		} catch (err) {
 			console.error(err);
 		}
@@ -21,7 +23,7 @@ export class Employee extends Component {
 
 	isDate = function (date) {
 		date = date.toString();
-		console.log(date);
+
 		if (
 			date.match(
 				/^(-?(?:[1-9][0-9]*)?[0-9]{4})-(1[0-2]|0[1-9])-(3[01]|0[1-9]|[12][0-9])T(2[0-3]|[01][0-9]):([0-5][0-9]):([0-5][0-9])(.[0-9]+)?(Z)?$/g
@@ -32,22 +34,6 @@ export class Employee extends Component {
 			return false;
 		}
 		// return new Date(date) !== 'Invalid Date' && !isNaN(new Date(date));
-	};
-
-	isLink = (link) => {
-		var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
-		var regex = new RegExp(expression);
-
-		link = link.toString();
-		if (
-			link.match(
-				/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
-			)
-		) {
-			return true;
-		} else {
-			return false;
-		}
 	};
 
 	formatData = () => {
@@ -65,9 +51,6 @@ export class Employee extends Component {
 		}
 		for (const key in this.state.data) {
 			let value = this.state.data[key];
-			if (key === 'photo') {
-				continue;
-			}
 			if (this.isDate(value)) {
 				// it is a date
 				// format it
@@ -76,8 +59,6 @@ export class Employee extends Component {
 						{key} : {dayjs(value).fromNow()}
 					</p>
 				);
-			} else if (this.isLink(value)) {
-				x.push(<a href={value}>{key}</a>);
 			} else {
 				x.push(
 					<p>
@@ -90,23 +71,61 @@ export class Employee extends Component {
 		return <div>{x}</div>;
 	};
 
+	onSubmitHandler = async (keys, values) => {
+		// keys and values we have
+		// combine them into a json
+
+		try {
+			let obj = {};
+
+			for (let id = 0; id < keys.length; id++) {
+				const el = keys[id];
+				console.log(el);
+				let value = values[id];
+				value = value.toString();
+				if (el.trim() === '' || value.trim() === '') {
+					continue;
+				}
+				obj[el] = value;
+			}
+			// keys.forEach((el, id) => {
+
+			// });
+			console.log(obj);
+			obj['district'] = this.props.district;
+			let resp = await axios.put(
+				`/employees/${this.props.match.params.id}`,
+				{
+					...obj,
+				}
+			);
+			this.props.history.push(`/employee/${this.props.match.params.id}`);
+		} catch (err) {
+			console.error(err.response);
+			if (err.response.error) {
+				this.setState({ error: err.response.err });
+			}
+		}
+	};
+
 	render() {
 		dayjs.extend(relativeTime);
-
 		return (
 			<div>
-				{this.state.data && this.formatData()}
 				<div>
-					{this.props.role === 'DCPU' && (
-						<Link
-							to={`/employee/${this.props.match.params.id}/edit`}>
-							Edit Employee
-						</Link>
+					{this.state.data && (
+						<EditPane
+							onSubmitHandler={this.onSubmitHandler}
+							data={this.state.data}
+						/>
 					)}
 				</div>
+				{/* <div>{this.state.data && this.formatData()}</div> */}
+
+				{this.state.error && <p>{this.state.error}</p>}
 			</div>
 		);
 	}
 }
 
-export default Employee;
+export default EditEmployee;
