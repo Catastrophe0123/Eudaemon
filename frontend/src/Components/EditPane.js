@@ -10,32 +10,56 @@ export class EditPane extends Component {
 	//
 
 	componentDidMount = () => {
+		// we have the defaults and defaultValues as props
+		// defaultValues = ["name", "age", "dob"]
+
+		let { defaults, defaultValues } = this.props;
+		let keys = Object.keys(this.props.data);
+		let values = Object.values(this.props.data);
+		if (defaults) {
+			let len = defaultValues.length;
+			keys = [...defaultValues, ...Object.keys(this.props.data)];
+			defaultValues.forEach((e) => {
+				values.push('');
+			});
+			values = [...values, ...Object.values(this.props.data)];
+		}
 		// sort the data and setstate
 		this.setState({
-			keys: Object.keys(this.props.data),
-			values: Object.values(this.props.data),
+			keys,
+			values,
 		});
 	};
 
 	displayData = () => {
+		let len;
+		// let len = 'ad';
+		if (this.props.defaults) {
+			len = this.props.defaultValues.length;
+		} else {
+			len = 0;
+		}
 		return (
 			<div>
 				{this.state.keys.map((el, id) => {
 					return (
 						<div style={{ display: 'flex' }}>
 							<EditLabel
-								onChange={(event) => {
-									let val = event.target.value;
-									this.setState((st) => {
-										let keys = [...st.keys];
-										keys[id] = val;
-										console.log(val);
-										return {
-											...st,
-											keys,
-										};
-									});
-								}}>
+								onChange={
+									id >= len
+										? (event) => {
+												let val = event.target.value;
+												this.setState((st) => {
+													let keys = [...st.keys];
+													keys[id] = val;
+													return {
+														...st,
+														keys,
+													};
+												});
+										  }
+										: null
+								}>
 								{el}
 							</EditLabel>{' '}
 							:{' '}
@@ -45,7 +69,6 @@ export class EditPane extends Component {
 									this.setState((st) => {
 										let values = [...st.values];
 										values[id] = val;
-										console.log(val);
 										return {
 											...st,
 											values,

@@ -126,6 +126,14 @@ export class App extends Component {
 							)} // login
 						/>
 						<AuthRoute
+							path='/employee/create'
+							exact
+							axios={axios}
+							authenticated={this.state.authenticated}
+							component={CreateEmployee}
+						/>{' '}
+						{/* emp create */}
+						<AuthRoute
 							path='/employee/:id'
 							exact
 							role={this.state.role}
@@ -134,14 +142,6 @@ export class App extends Component {
 							component={Employee}
 						/>{' '}
 						{/* emp read */}
-						<AuthRoute
-							path='/employee/create'
-							exact
-							axios={axios}
-							authenticated={this.state.authenticated}
-							component={CreateEmployee}
-						/>{' '}
-						{/* emp create */}
 						<AuthRoute
 							path='/employee/:id/edit'
 							exact
