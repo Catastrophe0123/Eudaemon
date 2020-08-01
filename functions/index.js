@@ -461,6 +461,8 @@ exports.createNotificationOnCCICreate = functions
 				sender: snapshot.id,
 				read: false,
 				type: 'CCICreation',
+				message: `A CCI has been created in your district. Please take a look`,
+				link: `/cci/${snapshot.id}`,
 			});
 		} catch (err) {
 			console.error(err);
@@ -485,6 +487,8 @@ exports.createNotificationOnChildAdded = functions
 					sender: change.after.id,
 					read: false,
 					type: 'ChildAddedToCCI',
+					message: `A Child has been added to your CCI. Please take a look`,
+					link: `/child/${change.after.id}`,
 				});
 				return;
 			}
@@ -498,6 +502,8 @@ exports.createNotificationOnChildAdded = functions
 					sender: change.after.id,
 					read: false,
 					type: 'ChildAddedToCCI',
+					message: `A Child has been added to your CCI. Please take a look`,
+					link: `/child/${change.after.id}`,
 				});
 				return;
 			}
@@ -512,6 +518,8 @@ exports.createNotificationOnChildAdded = functions
 					sender: change.after.id,
 					read: false,
 					type: 'ChildDataUpdated',
+					message: `A child's information in your CCI has be updated. Please take a look`,
+					link: `/child/${change.after.id}`,
 				});
 				return;
 			}
@@ -590,6 +598,9 @@ exports.createNotificationOnDCPUCreated = functions
 			sender: snapshot.id,
 			read: false,
 			type: 'DCPUCreation',
+			message:
+				'A new DCPU has been established to your district. Please take a look',
+			link: `/dcpu/${change.after.id}`,
 		});
 	});
 
@@ -636,6 +647,9 @@ exports.createNotificationOnCWCCreated = functions
 			sender: snapshot.id,
 			read: false,
 			type: 'CWCCreation',
+			message:
+				'A new CWC has been established to your district. Please take a look',
+			link: `/cwc/${change.after.id}`,
 		});
 	});
 
@@ -682,6 +696,9 @@ exports.createNotificationOnPOCreated = functions
 			sender: snapshot.id,
 			read: false,
 			type: 'POCreation',
+			message:
+				'A new Probation officer has been appointed to your district. Please take a look',
+			link: `/po/${change.after.id}`,
 		});
 	});
 
@@ -698,6 +715,8 @@ exports.createNotificationOnCCIUpdated = functions
 			sender: change.after.id,
 			read: false,
 			type: 'CCIUpdated',
+			message: 'Your data has been updated. Please take a look',
+			link: `/cci/${change.after.id}`,
 		});
 	});
 
