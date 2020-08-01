@@ -1,9 +1,12 @@
 const functions = require('firebase-functions');
 // var admin = require('firebase-admin');
 const { body } = require('express-validator');
+const cors = require('cors');
 
 const express = require('express');
 const app = express();
+
+app.use(cors());
 
 /**
  * we use
@@ -24,7 +27,13 @@ const { admin, db } = require('./firebaseadmin');
 const firebase = require('./firebaseConfig');
 
 // CONTROLLERS
-const { createChild, updateChild, getChild } = require('./controllers/child');
+
+const {
+	createChild,
+	updateChild,
+	getChild,
+	getNotPlacedChildren,
+} = require('./controllers/child');
 const { uploadFiles } = require('./controllers/fileUpload');
 const {
 	createCCI,
@@ -148,6 +157,8 @@ app.post('/child/:id/upload/:type', [isAuth, isNotCCI], uploadFiles);
 
 // get data about a child
 // CCIs : CCI can only access child
+app.get('/child/notplaced', [isAuth], getNotPlacedChildren);
+
 app.get('/child/:id', [isAuth, isCorrectCCI], getChild);
 
 // Create a new CCI

@@ -56,6 +56,8 @@ export class CreateChild extends Component {
 				<h1>Create a child</h1>
 				<div>
 					<EditPane
+						defaults={true}
+						defaultValues={['name', 'age', 'dob']}
 						onCreateGuardianHandler={this.onCreateGuardianHandler}
 						onSubmitHandler={this.onSubmitHandler}
 						data={{}}

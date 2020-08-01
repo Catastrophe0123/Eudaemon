@@ -3,7 +3,7 @@ import axios from 'axios';
 // Next we make an 'instance' of it
 const instance = axios.create({
 	// .. where we make our configurations
-	// baseURL: 'https://asia-east2-eudaemon-20a5e.cloudfunctions.net/api',
+	baseURL: 'https://asia-east2-eudaemon-20a5e.cloudfunctions.net/api',
 });
 
 // Where you would set stuff like your 'Authorization' header, etc ...

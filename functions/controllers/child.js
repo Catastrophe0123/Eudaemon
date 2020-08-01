@@ -109,3 +109,29 @@ exports.getChild = async (req, res) => {
 	// 	return res.status(400).json({ error: err.message });
 	// }
 };
+
+exports.getNotPlacedChildren = async (req, res) => {
+	// get the children not in any cci yet
+
+	try {
+		console.log('in the aosid');
+		let district = req.query.district;
+		let doc = await db
+			.collection('children')
+			.where('district', '==', district)
+			.get();
+		let docs = doc.docs;
+		let final = [];
+		docs.forEach((childDoc) => {
+			let childData = childDoc.data();
+			if (!childData['cci']) {
+				childData['id'] = childDoc.id;
+				final.push(childData);
+			}
+		});
+		return res.status(200).json({ final });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
+	}
+};
