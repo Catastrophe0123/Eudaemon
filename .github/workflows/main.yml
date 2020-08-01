@@ -32,10 +32,12 @@
 #         echo Add other actions to build,
 #         echo test, and deploy your project.
 
+
 name: Firebase Deploy
 defaults:
     run:
         working-directory: ./frontend
+
 on:
     push:
         branches:
