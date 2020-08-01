@@ -408,6 +408,10 @@ app.get('/attendance/children', getChildrenData);
 
 app.post('/attendance/children', uploadAttendance);
 
+app.get('/testroute', (req, res) => {
+	return res.status(200).json({ message: 'testing testing' });
+});
+
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
 
