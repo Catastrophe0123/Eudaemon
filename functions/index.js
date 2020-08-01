@@ -80,6 +80,8 @@ const {
 	uploadAttendance,
 } = require('./controllers/attendance');
 
+const { sendMessage, getMessages } = require('./controllers/message');
+
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
 var isNotCCI = require('./middlewares/isNotCCI');
@@ -408,9 +410,8 @@ app.get('/attendance/children', getChildrenData);
 
 app.post('/attendance/children', uploadAttendance);
 
-app.get('/testroute', (req, res) => {
-	return res.status(200).json({ message: 'testing testing' });
-});
+app.post('/message', [isAuth], sendMessage);
+app.get('/message', [isAuth], getMessages);
 
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
