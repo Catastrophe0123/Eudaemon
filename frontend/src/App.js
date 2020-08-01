@@ -199,6 +199,13 @@ export class App extends Component {
 						/>{' '}
 						{/* child create */}
 						<AuthRoute
+							path='/child/:id'
+							exact
+							authenticated={this.state.authenticated}
+							component={Child}
+						/>{' '}
+						{/* child create */}
+						<AuthRoute
 							path='/child/:id/guardian/create'
 							exact
 							axios={axios}

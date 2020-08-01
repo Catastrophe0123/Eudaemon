@@ -37,6 +37,21 @@ export class Home extends Component {
 		}
 	};
 
+	onClickChildrenData = async () => {
+		try {
+			let resp = await Axios.get(
+				`/child/notplaced?district=${this.props.district}`
+			);
+			console.log(resp);
+			this.setState({
+				childrenData: resp.data.final,
+				showChildren: true,
+			});
+		} catch (err) {
+			console.error(err);
+		}
+	};
+
 	formatDCPUData = () => {};
 
 	fullAccessMarkUp = (role) => {
@@ -95,6 +110,25 @@ export class Home extends Component {
 					{this.props.role === 'DCPU' && (
 						<div>
 							<Link to='/employee/create'>Create a CCI</Link>
+						</div>
+					)}
+
+					<button
+						disabled={this.state.showChildren}
+						onClick={this.onClickChildrenData}>
+						Show Children who are not placed in any CCI yet
+					</button>
+					{this.state.showChildren && (
+						<div>
+							{this.state.childrenData.map((el) => {
+								return (
+									<div>
+										<Link to={`/child/${el.id}`}>
+											{el.name}
+										</Link>
+									</div>
+								);
+							})}
 						</div>
 					)}
 				</div>
