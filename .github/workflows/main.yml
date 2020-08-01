@@ -34,6 +34,9 @@
 
 
 name: Firebase Deploy
+defaults:
+  run:
+    working-directory: ./frontend
 on:
     push:
         branches:
