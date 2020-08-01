@@ -83,7 +83,7 @@ const {
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
 var isNotCCI = require('./middlewares/isNotCCI');
-var isCorrectCCI = require('./middlewares/isCorrectCCI');
+// var isCorrectCCI = require('./middlewares/isCorrectCCI');
 var { isCorrectDCPU, isDCPU } = require('./middlewares/isDCPU');
 var isAdmin = require('./middlewares/isAdmin');
 
@@ -159,7 +159,7 @@ app.post('/child/:id/upload/:type', [isAuth, isNotCCI], uploadFiles);
 // CCIs : CCI can only access child
 app.get('/child/notplaced', [isAuth], getNotPlacedChildren);
 
-app.get('/child/:id', [isAuth, isCorrectCCI], getChild);
+app.get('/child/:id', [isAuth], getChild);
 
 // Create a new CCI
 // only allowed to DCPUs in the same district
@@ -210,7 +210,7 @@ app.post(
 	createCCI
 );
 
-app.get('/cci/children', [isAuth, isCorrectCCI], getChildrenInCCI);
+app.get('/cci/children', [isAuth], getChildrenInCCI);
 
 // req.body = {
 //     district: String
