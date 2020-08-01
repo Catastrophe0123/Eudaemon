@@ -53,6 +53,8 @@ jobs:
               run: cd frontend/
             - name: Install Dependencies
               run: npm install
+            - name: pwd
+              run: ls
             # - name: Run Tests
             #   env:
             #       CI: true
