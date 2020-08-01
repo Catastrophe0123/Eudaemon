@@ -32,7 +32,6 @@
 #         echo Add other actions to build,
 #         echo test, and deploy your project.
 
-
 name: Firebase Deploy
 defaults:
     run:
@@ -58,6 +57,8 @@ jobs:
             #   run: npm test
             - name: Build
               run: npm run build
+              env:
+                  CI: false
             - name: Archive Production Artifact
               uses: actions/upload-artifact@master
               with:
