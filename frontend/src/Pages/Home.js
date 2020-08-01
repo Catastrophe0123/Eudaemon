@@ -3,6 +3,7 @@ import Axios from '../util/axiosinstance';
 import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Link } from 'react-router-dom';
+import '../styles/home.css';
 
 export class Home extends Component {
 	state = { data: null };
@@ -154,12 +155,15 @@ export class Home extends Component {
 	fullAccessMarkUp = (role) => {
 		return (
 			<div>
-				<div>
-					<button
-						disabled={this.state.showCCIs}
-						onClick={() => this.setState({ showCCIs: true })}>
-						CCIs under your jurisdiction
-					</button>
+				<div className='text-center  '>
+					<div className='block my-2'>
+						<button
+							className=' w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
+							disabled={this.state.showCCIs}
+							onClick={() => this.setState({ showCCIs: true })}>
+							CCIs under your jurisdiction
+						</button>
+					</div>
 
 					{this.state.showCCIs &&
 						this.state.data.ccis.map((el) => {
@@ -170,25 +174,35 @@ export class Home extends Component {
 							);
 						})}
 
-					<button
-						disabled={this.state.showPO}
-						onClick={this.onClickPOData}>
-						POs under your jurisdiction
-					</button>
+					<div className='block my-2'>
+						<button
+							className=' w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
+							disabled={this.state.showPO}
+							onClick={this.onClickPOData}>
+							POs under your jurisdiction
+						</button>
+					</div>
 					{this.state.showPO && (
 						<div>
 							{this.state.POData.po.map((el) => {
 								return (
-									<Link to={`/po/${el.id}`}>{el.name}</Link>
+									<div>
+										<Link to={`/po/${el.id}`}>
+											{el.name}
+										</Link>
+									</div>
 								);
 							})}
 						</div>
 					)}
-					<button
-						disabled={this.state.showDCPU}
-						onClick={this.onClickDCPUData}>
-						DCPUs under your jurisdiction
-					</button>
+					<div className='block my-2'>
+						<button
+							className='w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
+							disabled={this.state.showDCPU}
+							onClick={this.onClickDCPUData}>
+							DCPUs under your jurisdiction
+						</button>
+					</div>
 					{this.state.showDCPU && (
 						<div>
 							{/* {this.formatDCPUData()} */}
@@ -203,14 +217,21 @@ export class Home extends Component {
 							})}
 						</div>
 					)}
-					<Link to={'/child/create'}>Create a Child Profile</Link>
+					<button className='w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'>
+						{' '}
+						<Link to={'/child/create'}>Create a Child Profile</Link>
+					</button>
+
 					{this.props.role === 'DCPU' && (
-						<div>
-							<Link to='/employee/create'>Create a CCI</Link>
+						<div className='my-2'>
+							<button className=' w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'>
+								<Link to='/employee/create'>Create a CCI</Link>
+							</button>
 						</div>
 					)}
 
 					<button
+						className=' w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
 						disabled={this.state.showChildren}
 						onClick={this.onClickChildrenData}>
 						Show Children who are not placed in any CCI yet
@@ -235,8 +256,6 @@ export class Home extends Component {
 	partialAccessMarkUp = () => {
 		return (
 			<div>
-				<h1>cci specific route</h1>
-
 				<div>{this.state.data && this.formatData()}</div>
 				{this.state.error && <p>{this.state.error}</p>}
 				<button
@@ -255,12 +274,18 @@ export class Home extends Component {
 		console.log(this.props);
 		return (
 			<div>
-				<h1>Welcome to Eudaemon</h1>
-				<h1>This is your {this.props.organisation} Dashboard</h1>
+				<div className='text-2xl text-center mb-2 '>
+					Welcome to Eudaemon
+				</div>
+				<div className='text-2xl text-center mb-2'>
+					This is your {this.props.organisation} Dashboard
+				</div>
+				{/* <button onClick={this.showNotificationHandler}>
+					Notifications
+				</button> */}
 				{this.state.data && fullaccessRoles.includes(this.props.role)
 					? this.fullAccessMarkUp()
 					: this.partialAccessMarkUp()}
-				what do we show here
 			</div>
 		);
 	}
