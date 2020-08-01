@@ -100,7 +100,7 @@ export class App extends Component {
 		// }
 
 		return (
-			<div>
+			<div className='mx-auto p-4'>
 				<Router>
 					<Switch>
 						<AuthRoute

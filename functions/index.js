@@ -83,7 +83,7 @@ const {
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
 var isNotCCI = require('./middlewares/isNotCCI');
-var isCorrectCCI = require('./middlewares/isCorrectCCI');
+// var isCorrectCCI = require('./middlewares/isCorrectCCI');
 var { isCorrectDCPU, isDCPU } = require('./middlewares/isDCPU');
 var isAdmin = require('./middlewares/isAdmin');
 
@@ -159,7 +159,7 @@ app.post('/child/:id/upload/:type', [isAuth, isNotCCI], uploadFiles);
 // CCIs : CCI can only access child
 app.get('/child/notplaced', [isAuth], getNotPlacedChildren);
 
-app.get('/child/:id', [isAuth, isCorrectCCI], getChild);
+app.get('/child/:id', [isAuth], getChild);
 
 // Create a new CCI
 // only allowed to DCPUs in the same district
@@ -210,7 +210,7 @@ app.post(
 	createCCI
 );
 
-app.get('/cci/children', [isAuth, isCorrectCCI], getChildrenInCCI);
+app.get('/cci/children', [isAuth], getChildrenInCCI);
 
 // req.body = {
 //     district: String
@@ -408,6 +408,10 @@ app.get('/attendance/children', getChildrenData);
 
 app.post('/attendance/children', uploadAttendance);
 
+app.get('/testroute', (req, res) => {
+	return res.status(200).json({ message: 'testing testing' });
+});
+
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
 
@@ -461,6 +465,8 @@ exports.createNotificationOnCCICreate = functions
 				sender: snapshot.id,
 				read: false,
 				type: 'CCICreation',
+				message: `A CCI has been created in your district. Please take a look`,
+				link: `/cci/${snapshot.id}`,
 			});
 		} catch (err) {
 			console.error(err);
@@ -485,6 +491,8 @@ exports.createNotificationOnChildAdded = functions
 					sender: change.after.id,
 					read: false,
 					type: 'ChildAddedToCCI',
+					message: `A Child has been added to your CCI. Please take a look`,
+					link: `/child/${change.after.id}`,
 				});
 				return;
 			}
@@ -498,6 +506,8 @@ exports.createNotificationOnChildAdded = functions
 					sender: change.after.id,
 					read: false,
 					type: 'ChildAddedToCCI',
+					message: `A Child has been added to your CCI. Please take a look`,
+					link: `/child/${change.after.id}`,
 				});
 				return;
 			}
@@ -512,6 +522,8 @@ exports.createNotificationOnChildAdded = functions
 					sender: change.after.id,
 					read: false,
 					type: 'ChildDataUpdated',
+					message: `A child's information in your CCI has be updated. Please take a look`,
+					link: `/child/${change.after.id}`,
 				});
 				return;
 			}
@@ -590,6 +602,9 @@ exports.createNotificationOnDCPUCreated = functions
 			sender: snapshot.id,
 			read: false,
 			type: 'DCPUCreation',
+			message:
+				'A new DCPU has been established to your district. Please take a look',
+			link: `/dcpu/${change.after.id}`,
 		});
 	});
 
@@ -636,6 +651,9 @@ exports.createNotificationOnCWCCreated = functions
 			sender: snapshot.id,
 			read: false,
 			type: 'CWCCreation',
+			message:
+				'A new CWC has been established to your district. Please take a look',
+			link: `/cwc/${change.after.id}`,
 		});
 	});
 
@@ -682,6 +700,9 @@ exports.createNotificationOnPOCreated = functions
 			sender: snapshot.id,
 			read: false,
 			type: 'POCreation',
+			message:
+				'A new Probation officer has been appointed to your district. Please take a look',
+			link: `/po/${change.after.id}`,
 		});
 	});
 
@@ -698,6 +719,8 @@ exports.createNotificationOnCCIUpdated = functions
 			sender: change.after.id,
 			read: false,
 			type: 'CCIUpdated',
+			message: 'Your data has been updated. Please take a look',
+			link: `/cci/${change.after.id}`,
 		});
 	});
 
