@@ -52,14 +52,17 @@ jobs:
             - name: Move to frontend dir
               run: cd frontend/
             - name: Install Dependencies
+              working-directory: ./frontend
               run: npm install
             - name: pwd
+              working-directory: ./frontend
               run: ls
             # - name: Run Tests
             #   env:
             #       CI: true
             #   run: npm test
             - name: Build
+              working-directory: ./frontend
               run: npm run build
               env:
                   CI: false
