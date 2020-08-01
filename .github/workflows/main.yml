@@ -33,9 +33,9 @@
 #         echo test, and deploy your project.
 
 name: Firebase Deploy
-defaults:
-    run:
-        working-directory: ./frontend
+# defaults:
+#     run:
+#         working-directory: ./frontend
 
 on:
     push:
@@ -49,6 +49,8 @@ jobs:
         steps:
             - name: Checkout Repo
               uses: actions/checkout@master
+            - name: Move to frontend dir
+              run: cd frontend/
             - name: Install Dependencies
               run: npm install
             # - name: Run Tests
@@ -63,7 +65,7 @@ jobs:
               uses: actions/upload-artifact@master
               with:
                   name: build
-                  path: ./build
+                  path: build
     deploy:
         name: Deploy
         needs: build
