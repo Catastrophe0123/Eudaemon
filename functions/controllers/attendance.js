@@ -32,16 +32,15 @@ exports.uploadAttendance = async (req, res) => {
 	/**
 	 * req.body = {
 	 *	attendance: [{id: String, attendance: "y" | "n", name: String , timestamp: String } ],
-		cci: String
+		cci: String,
+		date: String
 	 * }
 	 */
 	try {
 		let data = req.body;
 		let { cci } = req.body;
 
-		let doc = await db
-			.doc(`attendance/${cci}--${new Date().toISOString}`)
-			.set(data);
+		let doc = await db.doc(`attendance/${cci}--${req.body.date}`).set(data);
 		return res
 			.status(201)
 			.json({ message: 'attendance recorded successfully' });
