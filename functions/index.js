@@ -20,6 +20,8 @@ const {
 	getLogin,
 	postSignup,
 	postLogin,
+	newGetLogin,
+	newnewGetlogin,
 } = require('./controllers/authentication');
 
 const { admin, db } = require('./firebaseadmin');
@@ -110,6 +112,7 @@ var isAdmin = require('./middlewares/isAdmin');
 }
  */
 app.get('/login', getLogin);
+app.post('/getLogin', newnewGetlogin);
 
 // signup route
 // TODO: Validation
