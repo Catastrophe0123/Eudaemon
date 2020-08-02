@@ -133,8 +133,7 @@ export class Login extends Component {
 		}
 		return (
 			<div>
-					<h1 className='center pt-2'>LOGIN PAGE</h1>{' '}
-				<br />
+				<h1 className='center pt-2'>LOGIN PAGE</h1> <br />
 				<div>
 					<div className='center'>
 						<label htmlFor='district'>Enter Email :</label>
@@ -149,7 +148,6 @@ export class Login extends Component {
 					</div>
 					<br />
 				</div>
-
 				<div className='center'>
 					{!this.state.hideButton && (
 						<button
@@ -159,96 +157,86 @@ export class Login extends Component {
 						</button>
 					)}
 				</div>
-
-				{this.state.error ? (
-					<p className='center'>{this.state.error}</p>
-				) : null}
 				{this.state.loading ? (
 					<p className='center'>Loading...</p>
 				) : null}
 				{/* role, organisation, email, password */}
+				{this.state.data && (
+					<form action=''>
+						<div className='center py-2'>
+							<label className='pr-4' htmlFor='email'>
+								Password :{' '}
+							</label>
+							<input
+								className='border-2 ml-2'
+								id='password'
+								name='password'
+								onChange={this.onInputChangeHandler}
+								type='password'
+							/>{' '}
+						</div>
 
-				<form action=''>
-					{/* <div className='center py-2'>
-						<label className='center' htmlFor='email'>
-							Email :{' '}
-						</label>
-						<input
-							className='border-2 ml-6 '
-							id='email'
-							name='email'
-							onChange={this.onInputChangeHandler}
-							type='email'
-						/>
-					</div> */}
-					<div className='center py-2'>
-						<label className='pr-4' htmlFor='email'>
-							Password :{' '}
-						</label>
-						<input
-							className='border-2 ml-2'
-							id='password'
-							name='password'
-							onChange={this.onInputChangeHandler}
-							type='password'
-						/>{' '}
-					</div>
+						<div className='center py-2'>
+							<label className='pr-4' htmlFor='role'>
+								Select your role
+							</label>
+							<select
+								className='border-2'
+								value={this.state.role}
+								onChange={this.onSelectInputHandler}
+								name='role'
+								id='role'>
+								<option value='DCPU'>DCPU</option>
+								<option value='CCI'>CCI</option>
+								<option value='CWC'>CWC</option>
+								<option value='PO'>PO</option>
+							</select>{' '}
+						</div>
 
-					<div className='center py-2'>
-						<label className='pr-4' htmlFor='role'>
-							Select your role
-						</label>
-						<select
-							className='border-2'
-							value={this.state.role}
-							onChange={this.onSelectInputHandler}
-							name='role'
-							id='role'>
-							<option value='DCPU'>DCPU</option>
-							<option value='CCI'>CCI</option>
-							<option value='CWC'>CWC</option>
-							<option value='PO'>PO</option>
-						</select>{' '}
-					</div>
+						<div className='center py-2'>
+							<label className='pr-4' htmlFor='organisation'>
+								Choose the name of your Organisation
+							</label>
+							<select
+								className='border-2'
+								value={this.state.organisation}
+								onChange={this.onInputChangeHandler}
+								name='organisation'
+								id='organisation'>
+								{this.state.data
+									? this.state.data[this.state.role].map(
+											(el) => {
+												if (this.state.role === 'PO') {
+													return (
+														<option value={el.id}>
+															{el.name}
+														</option>
+													);
+												}
+												return (
+													<option value={el.id}>
+														{el.id}
+													</option>
+												);
+											}
+									  )
+									: null}
+							</select>
+						</div>
 
-					<div className='center py-2'>
-						<label className='pr-4' htmlFor='organisation'>
-							Choose the name of your Organisation
-						</label>
-						<select
-							className='border-2'
-							value={this.state.organisation}
-							onChange={this.onInputChangeHandler}
-							name='organisation'
-							id='organisation'>
-							{this.state.data
-								? this.state.data[this.state.role].map((el) => {
-										if (this.state.role === 'PO') {
-											return (
-												<option value={el.id}>
-													{el.name}
-												</option>
-											);
-										}
-										return (
-											<option value={el.id}>
-												{el.id}
-											</option>
-										);
-								  })
-								: null}
-						</select>
-					</div>
-
-					<div className='center py-2'>
-						<button
-							className='text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
-							onClick={this.onLoginSubmitHandler}
-							type='submit'>
-							submit
-						</button>
-					</div>
-				</form>
+						<div className='center py-2'>
+							<button
+								className='text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
+								onClick={this.onLoginSubmitHandler}
+								type='submit'>
+								submit
+							</button>
+							{this.state.error ? (
+								<p className='center'>{this.state.error}</p>
+							) : null}
+						</div>
+					</form>
+				)}
 			</div>
 		);
 	}
