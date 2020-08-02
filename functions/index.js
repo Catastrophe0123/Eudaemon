@@ -20,6 +20,8 @@ const {
 	getLogin,
 	postSignup,
 	postLogin,
+	newGetLogin,
+	newnewGetlogin,
 } = require('./controllers/authentication');
 
 const { admin, db } = require('./firebaseadmin');
@@ -78,6 +80,8 @@ const { markNotificationsRead } = require('./controllers/notifications');
 const {
 	getChildrenData,
 	uploadAttendance,
+	postGuardianVisit,
+	getVisits,
 } = require('./controllers/attendance');
 
 const { sendMessage, getMessages } = require('./controllers/message');
@@ -108,6 +112,7 @@ var isAdmin = require('./middlewares/isAdmin');
 }
  */
 app.get('/login', getLogin);
+app.post('/getLogin', newnewGetlogin);
 
 // signup route
 // TODO: Validation
@@ -411,7 +416,12 @@ app.get('/attendance/children', getChildrenData);
 app.post('/attendance/children', uploadAttendance);
 
 app.post('/message', [isAuth], sendMessage);
+
 app.get('/message', [isAuth], getMessages);
+
+app.get('/attendance/guardians', getVisits);
+
+app.post('/attendance/guardians', postGuardianVisit);
 
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
