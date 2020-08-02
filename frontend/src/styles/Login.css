@@ -8,3 +8,8 @@
     background-color: #4299E1;
     padding-bottom: 20px;
 }
+
+.container {
+    width: auto;
+    height: auto;
+}

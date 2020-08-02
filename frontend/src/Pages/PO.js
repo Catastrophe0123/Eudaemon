@@ -75,15 +75,16 @@ export class PO extends Component {
 			}
 		}
 
-		return <div className='flex flex-col justify-center  '>{x}</div>;
+		return <div className='flex justify-center  '>{x}</div>;
 	};
 
 	render() {
 		dayjs.extend(relativeTime);
 		return (
-			<div className='text-center'>
+            <div className="pt-4">
+			<div className=' bg-blue-300 text-center'>
 				{this.state.data && this.formatData()}
-			</div>
+			</div> </div>
 		);
 	}
 }

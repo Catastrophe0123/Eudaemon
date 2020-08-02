@@ -111,18 +111,19 @@ export class App extends Component {
 			let x = '';
 			if (mess1.sender === this.props.organisation) {
 				x =
-					' p-2 my-2 border rounded bg-blue-500 text-white flex-row-reverse ';
+					' p-2 my-2 rounded text-white flex-row-reverse ';
 			} else {
 				x =
-					' p-2 my-2 border rounded bg-blue-500 text-white text-right  ';
+					' p-2 my-2 rounded text-white text-right  ';
 			}
 
 			return (
+                <div className="bg-blue-500 border-2 border-black">
 				<div style={{ alignContent: 'left' }} className={x}>
-					<div>
-						{mess1.sender} :{mess1.message}{' '}
+					<div >
+						<strong className="text-black">{mess1.sender}</strong> :{mess1.message}{' '}
 					</div>
-				</div>
+				</div></div>
 			);
 		});
 

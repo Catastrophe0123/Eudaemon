@@ -40,11 +40,12 @@ export class EditPane extends Component {
 			len = 0;
 		}
 		return (
-			<div>
+            <div className="pt-4 pb-4">
+			<div className="border-2 border-black bg-gray-400">
 				{this.state.keys.map((el, id) => {
 					return (
 						<div
-							className='justify-center text-center my-3 border-black border rounded-md'
+							className=''
 							style={{ display: 'flex' }}>
 							<EditLabel
 								onChange={
@@ -83,6 +84,7 @@ export class EditPane extends Component {
 					);
 				})}
 			</div>
+            </div> 
 		);
 	};
 

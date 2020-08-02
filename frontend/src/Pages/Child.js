@@ -5,7 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { Link } from 'react-router-dom';
 
 export class Child extends Component {
-	state = { data: null, fileType: 'SIR' };
+	state = { data: null, fileType: 'sir' };
 
 	fetchData = async () => {
 		try {
@@ -42,7 +42,7 @@ export class Child extends Component {
 		let x = [];
 		if (Object.keys(this.state.data).includes('photo')) {
 			x.push(
-				<img
+				<img className="pt-4 pb-10"
 					style={{
 						display: 'block',
 						'margin-left': 'auto',
@@ -55,7 +55,7 @@ export class Child extends Component {
 			);
 		} else {
 			x.push(
-				<img
+				<img className="pt-4 pb-10"
 					style={{
 						display: 'block',
 						'margin-left': 'auto',
@@ -70,34 +70,57 @@ export class Child extends Component {
 			);
 		}
 		for (const key in this.state.data) {
-			let value = this.state.data[key];
+            let value = this.state.data[key];
+            let links = ['SIR' ,'medrep' , 'ICP' , 'parentLetter' ]
 			if (this.isDate(value)) {
 				// it is a date
 				// format it
 				x.push(
-					<p>
-						{key} : {dayjs(value).fromNow()}
+					<p className="pb-4">
+						<strong>{key}</strong> : {dayjs(value).fromNow()}
 					</p>
 				);
 			} else if (key === 'photo') {
 				continue;
-			} else if (key === 'guardianName') {
+            }else if (links.includes(key)) {
+                x.push(
+                    <a href={value} target="_blank"><strong>{key}</strong> : {value} </a>
+                )
+                            }
+             else if (key === 'guardianName') {
 				x.push(
-					<Link to={`/guardian/${this.state.data['guardian']}`}>
-						{key}: {value}
-					</Link>
+					<Link className="pb-4" to={`/guardian/${this.state.data['guardian']}`}>
+						<strong>{key}: {value}</strong>
+					</Link> 
 				);
 			} else {
 				x.push(
-					<p className='justify-center text-center my-3 border-black border rounded-md'>
-						{key} : {value}
+					<p className='pb-4'>
+						<strong>{key} </strong> : {value}
 					</p>
 				);
 			}
 		}
 
-		return <div className='flex flex-col justify-center'>{x}</div>;
+		return <div className='flex pb-4 flex-col justify-center'>{x}</div>;
 	};
+
+    isLink = (link) => {
+		var expression = /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi;
+		var regex = new RegExp(expression);
+
+		link = link.toString();
+		if (
+			link.match(
+				/[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?/gi
+			)
+		) {
+			return true;
+		} else {
+			return false;
+		}
+	};
+
 
 	onFileUploadSelectHandler = (event) => {
 		let fileType = event.target.value;
@@ -107,7 +130,6 @@ export class Child extends Component {
 	handleFileUpload = async (event) => {
 		try {
 			const filename = event.target.files[0];
-
 			const formData = new FormData();
 			formData.append('file', filename, filename.name);
 			let resp = await axios.post(
@@ -117,6 +139,7 @@ export class Child extends Component {
 			this.fetchData();
 			// this.props.history.push(`/child/${this.props.match.params.id}`);
 		} catch (err) {
+            console.log(err.response)
 			console.log(err);
 		}
 	};
@@ -124,7 +147,8 @@ export class Child extends Component {
 	render() {
 		dayjs.extend(relativeTime);
 		return (
-			<div className='text-center'>
+            <div className="pt-4 ">
+			<div className='container bg-blue-300 border-2 border-black text-center'>
 				<div>{this.state.data && this.formatData()}</div>
 
 				{this.state.error && <p>{this.state.error}</p>}
@@ -137,14 +161,14 @@ export class Child extends Component {
 							</Link>
 						</button>
 
-						<div>
+						<div className='pt-10 pb-10'>
 							<label htmlFor='fileType'>
 								<select
 									value={this.state.fileType}
 									onChange={this.onFileUploadSelectHandler}
 									name='fileType'
 									id='fileType'>
-									<option value='SIR'>SIR</option>
+									<option value='sir'>SIR</option>
 									<option value='medrep'>
 										Medical Report
 									</option>
@@ -165,6 +189,7 @@ export class Child extends Component {
 					</div>
 				)}
 			</div>
+            </div>
 		);
 	}
 }
