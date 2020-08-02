@@ -49,3 +49,42 @@ exports.uploadAttendance = async (req, res) => {
 		return res.status(400).json({ error: err.message });
 	}
 };
+
+exports.postGuardianVisit = async (req, res) => {
+	//req.body = {
+	// 	childId: child id,
+	// 	date:  ISOString,
+	// 	guardianId: String,
+	// 	guardianName: String,
+	// 	startTime: ISOString,
+	// 	stopTime: ISOString,
+	//	cci: cciName
+	// }
+
+	try {
+		let data = req.body;
+		let resp = await db.collection('visits').add(data);
+		return res.status(201).json({ message: 'visit recorded successfully' });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
+	}
+};
+
+exports.getVisits = async (req, res) => {
+	let cci = req.query.cci;
+	// api.comasdqd/api/attendance/guardians?cci=chennai-cci1
+	try {
+		let x = await db.collection('visits').where('cci', '==', cci).get();
+		let docs = x.docs;
+		let final = [];
+		for (const visitDoc of docs) {
+			let visit = visitDoc.data();
+			final.push(visit);
+		}
+		return res.status(200).json({ data: final });
+	} catch (err) {
+		console.error(err);
+		return res.status(400).json({ error: err.message });
+	}
+};
