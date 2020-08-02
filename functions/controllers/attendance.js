@@ -64,6 +64,9 @@ exports.postGuardianVisit = async (req, res) => {
 	try {
 		let data = req.body;
 		let resp = await db.collection('visits').add(data);
+		let guardian = await db
+			.doc(`guardians/${data.guardianId}`)
+			.update({ lastVisited: req.body.startTime });
 		return res.status(201).json({ message: 'visit recorded successfully' });
 	} catch (err) {
 		console.error(err);

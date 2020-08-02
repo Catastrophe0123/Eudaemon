@@ -515,7 +515,7 @@ exports.createNotificationOnChildAdded = functions
 
 				let doc = await db
 					.doc(`children/${change.after.id}`)
-					.update({ sentiment: sentimentValue });
+					.update({ sentiment: sentimentValue.toString() });
 			};
 
 			// if child data was updated
@@ -755,11 +755,122 @@ exports.createNotificationOnMessageCreated = functions
 			recipients: [data.receiver],
 			sender: data.sender,
 			read: false,
-			type: 'CCIUpdated',
+			type: 'MessageSent',
 			message: `${data.sender} just sent you a message. Please take a look`,
-			link: `/message/${data.receiver}`,
+			link: `/message`,
 		});
 		return;
+	});
+
+// firebase pubsub functions
+
+const twilio = require('twilio');
+const accountSid = functions.config().twilio.sid;
+const authToken = functions.config().twilio.token;
+
+const client = new twilio(accountSid, authToken);
+
+const twilioNumber = '+12058507105';
+
+// exports.taskRunner = functions
+// 	.region('asia-east2')
+// 	.pubsub.schedule('* * * * *')
+// 	.onRun(async (context) => {
+// 		// this runs every 1 minute
+// 		const now = new Date().toISOString();
+// 		const query = db.collection('visits').where('startTime', '<=', now);
+// 		const tasks = await query.get();
+
+// 		const jobs = [];
+
+// 		// tasks.forEach(snapshot => {
+// 		// 	let { guardianId } = snapshot.data();
+// 		// 	let guardianDoc = await db.doc(`/guardian/${guardianId}`).get();
+
+// 		// })
+
+// 		makeCall = (number) => {
+// 			const textMessage = {
+// 				body: 'give appropriate content',
+// 				to: number,
+// 				from: twilioNumber,
+// 			};
+
+// 			return client.messages.create(textMessage);
+// 		};
+
+// 		tasks.forEach(async (snapshot) => {
+// 			let { guardianId } = snapshot.data();
+// 			let guardianDoc = await db.doc(`guardians/${guardianId}`).get();
+// 			if (guardianDoc.exists) {
+// 				let data = guardianDoc.data();
+// 				if (data.phoneNumber) {
+// 					let number = `+91${data.phoneNumber}`;
+// 					if (/^\+?[1-9]\d{1,14}$/.test(number)) {
+// 						// number is valid
+// 						// do the call
+// 						let job = makeCall(number);
+// 						jobs.push(job);
+// 					} else {
+// 						return;
+// 					}
+// 				}
+// 			}
+// 		});
+
+// 		return await Promise.all(jobs);
+// 	});
+
+exports.guardianVisitsCronJob = functions
+	.region('asia-east2')
+	.pubsub.schedule('* * * * *')
+	.onRun(async (context) => {
+		// run this function to calculate whether the guardian is visiting or not
+		let now = new Date();
+		try {
+			let guardianDocs = await db.collection('guardians').get();
+
+			let dcpuDoc = await db.collection('dcpu').get();
+			let dcpus = dcpuDoc.docs;
+
+			// guardianDocs.forEach(el => el.)
+
+			for (const guardianDoc of guardianDocs) {
+				let guardianData = guardianDoc.data();
+
+				let lastVisited = guardianData['lastVisited'];
+				if (lastVisited) {
+					let dcpuIds = [];
+					for (const dcpu of dcpus) {
+						dcpuIds.push(dcpu.id);
+					}
+
+					const date1 = new Date(lastVisited);
+					const date2 = new Date();
+					const diffTime = Math.abs(date2 - date1);
+					const diffDays = Math.ceil(
+						diffTime / (1000 * 60 * 60 * 24)
+					);
+					// console.log(diffTime + ' milliseconds');
+					console.log(diffDays + ' days');
+					if (diffDays >= 60) {
+						// create notification
+						let resp = await db.collection('notification').add({
+							createdAt: new Date().toISOString(),
+							recipients: [...dcpuIds],
+							sender: guardianDoc.id,
+							read: false,
+							type: 'GuardianNotVisiting',
+							message: `A Guardian has not visited his ward for the past ${diffDays} days`,
+							link: `/guardian/${guardianDoc.id}`,
+						});
+					}
+				}
+			}
+		} catch (err) {
+			console.log(err);
+			return;
+		}
 	});
 
 // notifications for
@@ -772,3 +883,53 @@ exports.createNotificationOnMessageCreated = functions
 // all updates
 // all messages
 // all deletes
+
+exports.sendSMSOnVisitCreate = functions
+	.region('asia-east2')
+	.firestore.document('visits/{id}')
+	.onCreate(async (snapshot, context) => {
+		console.log('msg function');
+		let makeCall = (number, data, startTime) => {
+			console.log('inside helper function');
+			let d = new Date(startTime);
+			const textMessage = {
+				body: `Dear ${
+					data.name
+				}, your appointment to visit your ward has been scheduled on ${d.toLocaleString()}`,
+				to: number,
+				from: twilioNumber,
+			};
+
+			return client.messages.create(textMessage);
+		};
+
+		try {
+			let { guardianId, startTime } = snapshot.data();
+			let guardianDoc = await db.doc(`guardians/${guardianId}`).get();
+			console.log('get the guardiandoc function');
+
+			if (guardianDoc.exists) {
+				let data = guardianDoc.data();
+				if (data.phoneNumber) {
+					let number = `+91${data.phoneNumber}`;
+					if (/^\+?[1-9]\d{1,14}$/.test(number)) {
+						// number is valid
+						// do the call
+						console.log('inside if before calling');
+
+						let job = await makeCall(number, data, startTime);
+						console.log('after calling');
+
+						let x = await snapshot.ref.update({
+							status: 'SMS Sent',
+						});
+					} else {
+						return;
+					}
+				}
+			}
+		} catch (err) {
+			console.error(err);
+			return;
+		}
+	});
