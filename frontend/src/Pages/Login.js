@@ -133,9 +133,7 @@ export class Login extends Component {
 		}
 		return (
 			<div>
-				<div className='header'>
 					<h1 className='center pt-2'>LOGIN PAGE</h1>{' '}
-				</div>
 				<br />
 				<div>
 					<div className='center'>

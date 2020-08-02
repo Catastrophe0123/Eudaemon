@@ -4,9 +4,21 @@ import dayjs from 'dayjs';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Link } from 'react-router-dom';
 import '../styles/home.css';
+import BellIcon from 'react-bell-icon';
 
 export class Home extends Component {
-	state = { data: null };
+    state = {
+    data: null,
+    bell: false,
+    open: false
+    };
+
+    componentDidMount() {
+        document.addEventListener("mousedown", this.handleClickOutside);
+    }
+    componentWillUnmount() {
+      document.removeEventListener("mousedown", this.handleClickOutside);
+    }
 
 	componentDidMount = async () => {
 		try {
@@ -32,6 +44,14 @@ export class Home extends Component {
 		}
 	};
 
+    handleButtonClick = () => {
+        this.setState(state => {
+          return {
+            open: !state.open,
+          };
+        });
+      };
+      
 	onClickPOData = async () => {
 		try {
 			let resp = await Axios.get(`/po?district=${this.props.district}`);
@@ -152,6 +172,14 @@ export class Home extends Component {
 		return <div>{x}</div>;
 	};
 
+    handleClickOutside = event => {
+        if (this.container.current && !this.container.current.contains(event.target)) {
+          this.setState({
+            open: false,
+          });
+        }
+      };
+
 	fullAccessMarkUp = (role) => {
 		return (
 			<div>
@@ -164,7 +192,6 @@ export class Home extends Component {
 							CCIs under your jurisdiction
 						</button>
 					</div>
-
 					{this.state.showCCIs &&
 						this.state.data.ccis.map((el) => {
 							return (
@@ -179,7 +206,7 @@ export class Home extends Component {
 							className=' w-64 text-white font-bold px-6 py-4 rounded outline-none focus:outline-none mr-1 mb-2 bg-blue-500 active:bg-blue-600 uppercase text-sm shadow hover:shadow-lg'
 							disabled={this.state.showPO}
 							onClick={this.onClickPOData}>
-							POs under your jurisdiction
+							POs under your jurisdiction   
 						</button>
 					</div>
 					{this.state.showPO && (
@@ -266,19 +293,39 @@ export class Home extends Component {
 				{this.state.childData && this.showChildData()}
 			</div>
 		);
-	};
-
+    };
+    logoutMap = () => {
+        localStorage.clear()
+        this.props.logout()
+    }
 	render() {
 		dayjs.extend(relativeTime);
 		let fullaccessRoles = ['DCPU', 'CWC', 'PO'];
 		console.log(this.props);
 		return (
 			<div>
-				<div className='text-2xl text-center mb-2 '>
-					Welcome to Eudaemon
+            <div className="container" ref={this.state.open}>
+                <button type="button" class="button"  onClick={this.handleButtonClick}>
+                <BellIcon className="bell" width='40' active={true} animate={this.setState.bell} />   
+                </button>
+        {this.state.open && (
+        <div class="dropdown">
+        <ul>
+            {this.state.data.notifications.map(notification => (
+                <li>{notification.type}</li>
+            ))} 
+        </ul>
+        </div> 
+        )}
+    </div>
+    
+    <div className='text-2xl text-center mb-2 '>
+					Welcome to Eudaemon 
 				</div>
+
+                <button className="border-2 border-gray-900" onClick={this.logoutMap}>Logout</button>                
 				<div className='text-2xl text-center mb-2'>
-					This is your {this.props.organisation} Dashboard
+					This is your {this.props.organisation} Dashboard 
 				</div>
 				{/* <button onClick={this.showNotificationHandler}>
 					Notifications
