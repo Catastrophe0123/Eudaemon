@@ -80,6 +80,8 @@ const {
 	uploadAttendance,
 } = require('./controllers/attendance');
 
+const { sendMessage, getMessages } = require('./controllers/message');
+
 // MIDDLEWARES
 var isAuth = require('./middlewares/isAuth');
 var isNotCCI = require('./middlewares/isNotCCI');
@@ -408,9 +410,8 @@ app.get('/attendance/children', getChildrenData);
 
 app.post('/attendance/children', uploadAttendance);
 
-app.get('/testroute', (req, res) => {
-	return res.status(200).json({ message: 'testing testing' });
-});
+app.post('/message', [isAuth], sendMessage);
+app.get('/message', [isAuth], getMessages);
 
 // exports.api = functions.https.onRequest(app);
 exports.api = functions.region('asia-east2').https.onRequest(app);
@@ -481,39 +482,33 @@ exports.createNotificationOnChildAdded = functions
 		try {
 			let afterData = change.after.data();
 			let beforeData = change.before.data();
-			// check if child was added to their cci
-			if (!beforeData.cci && afterData.cci) {
-				// cci was added to the child. so notify the cci
-				let x = await db.collection('notification').add({
-					// create the notification
-					createdAt: new Date().toISOString(),
-					recipients: afterData.cci,
-					sender: change.after.id,
-					read: false,
-					type: 'ChildAddedToCCI',
-					message: `A Child has been added to your CCI. Please take a look`,
-					link: `/child/${change.after.id}`,
-				});
-				return;
-			}
 
-			if (beforeData.cci !== afterData.cci) {
-				// cci was changed so notify the cci
-				let x = await db.collection('notification').add({
-					// create the notification
-					createdAt: new Date().toISOString(),
-					recipients: [afterData.cci],
-					sender: change.after.id,
-					read: false,
-					type: 'ChildAddedToCCI',
-					message: `A Child has been added to your CCI. Please take a look`,
-					link: `/child/${change.after.id}`,
-				});
-				return;
-			}
+			performSentiment = async () => {
+				console.log('inside the sentiment analysis listener');
+				// perform sentiment analysis
+				var Analyzer = require('natural').SentimentAnalyzer;
+				var stemmer = require('natural').PorterStemmer;
+				var analyzer = new Analyzer('English', stemmer, 'afinn');
+				// // getSentiment expects an array of strings
+
+				let data = afterData.review;
+
+				// remove punctuations
+
+				data = data.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+
+				data = data.split(' ');
+
+				let sentimentValue = analyzer.getSentiment(data);
+				console.log('got the sentiment value');
+				console.log(`value is : ${sentimentValue}`);
+
+				let doc = await db
+					.doc(`children/${change.after.id}`)
+					.update({ sentiment: sentimentValue });
+			};
 
 			// if child data was updated
-
 			if (afterData.cci) {
 				let x = await db.collection('notification').add({
 					// create the notification
@@ -525,6 +520,40 @@ exports.createNotificationOnChildAdded = functions
 					message: `A child's information in your CCI has be updated. Please take a look`,
 					link: `/child/${change.after.id}`,
 				});
+			}
+
+			// check if child was added to their cci
+			// if (!beforeData.cci && afterData.cci) {
+			// 	// cci was added to the child. so notify the cci
+			// 	let x = await db.collection('notification').add({
+			// 		// create the notification
+			// 		createdAt: new Date().toISOString(),
+			// 		recipients: afterData.cci,
+			// 		sender: change.after.id,
+			// 		read: false,
+			// 		type: 'ChildAddedToCCI',
+			// 		message: `A Child has been added to your CCI. Please take a look`,
+			// 		link: `/child/${change.after.id}`,
+			// 	});
+			// 	return;
+			// }
+
+			if (
+				(!beforeData.cci && afterData.cci) ||
+				beforeData.cci !== afterData.cci
+			) {
+				// cci was changed so notify the cci
+				let x = await db.collection('notification').add({
+					// create the notification
+					createdAt: new Date().toISOString(),
+					recipients: [afterData.cci],
+					sender: change.after.id,
+					read: false,
+					type: 'ChildAddedToCCI',
+					message: `A Child has been added to your CCI. Please take a look`,
+					link: `/child/${change.after.id}`,
+				});
+				performSentiment();
 				return;
 			}
 
@@ -532,27 +561,7 @@ exports.createNotificationOnChildAdded = functions
 				(!beforeData.review && afterData.review) ||
 				beforeData.review !== afterData.review
 			) {
-				console.log('inside the sentiment analysis listener');
-				// perform sentiment analysis
-				var Analyzer = require('natural').SentimentAnalyzer;
-				var stemmer = require('natural').PorterStemmer;
-				var analyzer = new Analyzer('English', stemmer, 'afinn');
-				// getSentiment expects an array of strings
-
-				let data = afterData.review;
-
-				// remove punctuations
-				data = data.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
-
-				data = data.split(' ');
-
-				let sentimentValue = analyzer.getSentiment(data);
-				console.log('got the sentiment value');
-				console.log(`value is : ${sentimentValue}`);
-				let doc = await db
-					.doc(`children/${change.after.id}`)
-					.update({ sentiment: sentimentValue });
-				return;
+				performSentiment();
 			}
 		} catch (err) {
 			return;
@@ -722,6 +731,25 @@ exports.createNotificationOnCCIUpdated = functions
 			message: 'Your data has been updated. Please take a look',
 			link: `/cci/${change.after.id}`,
 		});
+	});
+
+exports.createNotificationOnMessageCreated = functions
+	.region('asia-east2')
+	.firestore.document('message/{id}')
+	.onCreate(async (snapshot, context) => {
+		// code
+		let data = snapshot.data();
+
+		let resp = await db.collection('notification').add({
+			createdAt: new Date().toISOString(),
+			recipients: [data.receiver],
+			sender: data.sender,
+			read: false,
+			type: 'CCIUpdated',
+			message: `${data.sender} just sent you a message. Please take a look`,
+			link: `/message/${data.receiver}`,
+		});
+		return;
 	});
 
 // notifications for
