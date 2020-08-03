@@ -566,6 +566,12 @@ exports.createNotificationOnChildAdded = functions
 				(!beforeData.cci && afterData.cci) ||
 				beforeData.cci !== afterData.cci
 			) {
+				let doc = await db.doc(`children/${change.after.id}`).update({
+					previousInstitutions: admin.firestore.FieldValue.arrayUnion(
+						beforeData.cci
+					),
+				});
+
 				// cci was changed so notify the cci
 				let x = await db.collection('notification').add({
 					// create the notification
@@ -603,7 +609,7 @@ exports.createNotificationOnChildAdded = functions
 					let review = afterData.reviews[i];
 					let sentiment = await performSentiment(review);
 					total += sentiment;
-					sentiments.push(sentiment.toString());
+					sentiments.push(sentiment.toFixed(2).toString());
 				}
 				let sentiment = total / afterData.reviews.length;
 				sentiment.toFixed(2);
@@ -826,7 +832,7 @@ exports.createNotificationOnCCIUpdated = functions
 					let review = afterData.reviews[i];
 					let sentiment = await performSentiment(review);
 					total += sentiment;
-					sentiments.push(sentiment.toString());
+					sentiments.push(sentiment.toFixed(2).toString());
 				}
 				let sentiment = total / afterData.reviews.length;
 
