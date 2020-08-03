@@ -20,20 +20,20 @@ export class Home extends Component {
 		document.removeEventListener('mousedown', this.handleClickOutside);
 	}
 
-    onClickChildrenData = async () => {
-        try {
-            let resp = await Axios.get('/child/notplaced', {
-                params: { district: this.props.district },
-            });
-            this.setState({
-                childrenNotPlaced: resp.data,
-                showChildrenNotPlaced: true,
-            });
-            console.log(resp);
-        } catch (err) {
-            console.log(err.response);
-        }
-    }; 
+	onClickChildrenData = async () => {
+		try {
+			let resp = await Axios.get('/child/notplaced', {
+				params: { district: this.props.district },
+			});
+			this.setState({
+				childrenNotPlaced: resp.data,
+				showChildrenNotPlaced: true,
+			});
+			console.log(resp);
+		} catch (err) {
+			console.log(err.response);
+		}
+	};
 
 	componentDidMount = async () => {
 		try {
